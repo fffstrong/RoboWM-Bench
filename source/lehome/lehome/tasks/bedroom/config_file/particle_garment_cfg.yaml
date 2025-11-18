@@ -1,0 +1,70 @@
+# Environment configuration
+num_envs: 4  # Number of parallel environments to run simultaneously
+env_offset: [1.0, 1.0, 0.0]  # Spatial offset for parallel environments (x,y,z) to prevent overlap between environments
+
+room:
+  prim_path_prefix: "/Room_{env_id}"  # Path prefix for room prims in the stage; {env_id} is replaced with the environment index (e.g., "/Room_0")
+
+# Object configuration
+objects:
+  # Path to folder containing USD files (e.g., cube.usd, cone.usd)
+  common:
+    initial_pos_range: [1.38, -2.61, 0.63, 1.42, -2.59, 0.63] 
+    initial_rot_range: [0, 0, -3, 0, 0, 3] 
+    soft_reset_pos_range: [1.38, -2.61, 0.63, 1.42, -2.59, 0.63] 
+    soft_reset_rot_range: [0, 0, -1, 0, 0, 1] 
+    scale: [0.0045, 0.0045, 0.0045]
+  # Object-specific configurations (override common settings)
+  # visual_material:
+  #   material_usd_folder: "Assets/textures/garment"
+  particle_system:
+    particle_system_enabled: True
+    enable_ccd: True
+    solver_position_iteration_count: 24
+    max_depenetration_velocity: null
+    global_self_collision_enabled: True
+    non_particle_collision_enabled: True
+    contact_offset: 0.005
+    rest_offset: 0.0025
+    particle_contact_offset: 0.005
+    fluid_rest_offset: 0.0025
+    solid_rest_offset: 0.0025
+    wind: null
+    max_neighborhood: null
+    max_velocity: 5.0
+  particle_material:
+    adhesion: 0.0005
+    adhesion_offset_scale: 0.0
+    cohesion: 0.0
+    particle_adhesion_scale: 0.2
+    particle_friction_scale: 0.6
+    drag: 0.0
+    lift: 0.0
+    friction: 1.0
+    damping: 0.05
+    gravity_scale: 2.0
+    viscosity: null
+    vorticity_confinement: null
+    surface_tension: null
+  garment_config:
+    particle_mass: 1e-2
+    self_collision: True
+    self_collision_filter: True
+    stretch_stiffness: 1e8
+    bend_stiffness: 100.0
+    shear_stiffness: 100.0
+    spring_damping: 10.0
+  # Texture randomization configuration
+  texture_randomization:
+    enable: True
+    folder: "Assets/textures/surface/seen"
+    min_id: 1
+    max_id: 10000
+    prim_path: "/World/Scene/Table038/looks/M_Table038a/UsdPreviewSurface/________7/________7"
+
+  # Light randomization configuration
+  light_randomization:
+    enable: True
+    prim_path: "/World/Light"
+    intensity_range: [3500, 5000]
+    color_range: [0.0, 0.2]
