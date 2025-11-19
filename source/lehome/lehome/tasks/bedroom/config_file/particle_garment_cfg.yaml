@@ -9,11 +9,11 @@ room:
 objects:
   # Path to folder containing USD files (e.g., cube.usd, cone.usd)
   common:
-    initial_pos_range: [1.38, -2.61, 0.63, 1.42, -2.59, 0.63] 
-    initial_rot_range: [0, 0, -3, 0, 0, 3] 
+    initial_pos_range: [1.4, -2.6, 0.63, 1.4, -2.6, 0.63]  #[128.81421, 62.60039, 263, 128.81421, 62.60039, 263]
+    initial_rot_range: [0, 0, 0, 0, 0, 0]  #[0, 0, 0, 0, 0, 0] 
     soft_reset_pos_range: [1.38, -2.61, 0.63, 1.42, -2.59, 0.63] 
     soft_reset_rot_range: [0, 0, -1, 0, 0, 1] 
-    scale: [0.0045, 0.0045, 0.0045]
+    scale: [0.45, 0.45, 0.45]
   # Object-specific configurations (override common settings)
   # visual_material:
   #   material_usd_folder: "Assets/textures/garment"
@@ -56,7 +56,7 @@ objects:
     spring_damping: 10.0
   # Texture randomization configuration
   texture_randomization:
-    enable: True
+    enable: False
     folder: "Assets/textures/surface/seen"
     min_id: 1
     max_id: 10000
@@ -64,7 +64,7 @@ objects:
 
   # Light randomization configuration
   light_randomization:
-    enable: True
+    enable: False
     prim_path: "/World/Light"
     intensity_range: [3500, 5000]
     color_range: [0.0, 0.2]

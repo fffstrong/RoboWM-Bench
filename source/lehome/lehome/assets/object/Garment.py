@@ -77,7 +77,6 @@ class GarmentObject(SingleClothPrim):
         self.init_pos, self.init_ori, self.init_scale = self._get_initial_pose()
         # Load USD asset as a reference
         add_reference_to_stage(usd_path=usd_path, prim_path=prim_path)
-
         # define particle system for garment
         self.particle_system = SingleParticleSystem(
             prim_path=self.particle_system_path,
@@ -173,6 +172,7 @@ class GarmentObject(SingleClothPrim):
                 "spring_damping", None
             ),
         )
+
         # set visual material
         # self.visual_material_usd_folder = self.objects_config.visual_material.get(
         #     "material_usd_folder", None
