@@ -4,10 +4,13 @@ import math
 
 def dynamic_reset_gripper_effort_limit_sim(env, teleop_device):
     need_to_set = []
-    if teleop_device == "bi-so101leader":
-        need_to_set = [env.scene.articulations['left_arm'], env.scene.articulations['right_arm']]
+    if teleop_device in ["bi-so101leader", "bi-keyboard"]:
+        need_to_set = [
+            env.scene.articulations["left_arm"],
+            env.scene.articulations["right_arm"],
+        ]
     elif teleop_device in ["so101leader", "keyboard"]:
-        need_to_set = [env.scene['robot']]
+        need_to_set = [env.scene["robot"]]
     for arm in need_to_set:
         write_gripper_effort_limit_sim(env, arm)
     return
@@ -33,13 +36,17 @@ def write_gripper_effort_limit_sim(env, env_arm):
     object_positions = torch.stack(object_positions)  # [num_objects, num_envs, 3]
     object_masses = torch.stack(object_masses)  # [num_objects, num_envs, 1]
 
-    distances = torch.sqrt(torch.sum((object_positions - gripper_pos.unsqueeze(0)) ** 2, dim=2))
+    distances = torch.sqrt(
+        torch.sum((object_positions - gripper_pos.unsqueeze(0)) ** 2, dim=2)
+    )
 
     min_distances, min_indices = torch.min(distances, dim=0)  # [num_envs]
 
     target_masses = object_masses[min_indices.cpu(), 0, 0]  # [num_envs]
 
-    target_effort_limits = (target_masses / 0.15).to(env_arm._data.joint_effort_limits.device)
+    target_effort_limits = (target_masses / 0.15).to(
+        env_arm._data.joint_effort_limits.device
+    )
 
     current_effort_limit_sim = env_arm._data.joint_effort_limits[:, -1]  # [num_envs]
     need_update = torch.abs(target_effort_limits - current_effort_limit_sim) > 0.1
@@ -49,8 +56,7 @@ def write_gripper_effort_limit_sim(env, env_arm):
         new_limits[need_update] = target_effort_limits[need_update]
 
         env_arm.write_joint_effort_limit_to_sim(
-            limits=new_limits,
-            joint_ids=[5 for _ in range(num_envs)]
+            limits=new_limits, joint_ids=[5 for _ in range(num_envs)]
         )
 
 

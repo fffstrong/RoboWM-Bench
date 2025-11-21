@@ -8,3 +8,12 @@ gym.register(
         "env_cfg_entry_point": f"{__name__}.garment_bi_cfg:GarmentEnvCfg",
     },
 )
+
+gym.register(
+    id="LeHome-SO101-Direct-Garment-v0",
+    entry_point=f"{__name__}.garment:GarmentEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.garment_cfg:GarmentEnvCfg",
+    },
+)

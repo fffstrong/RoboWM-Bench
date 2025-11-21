@@ -26,7 +26,7 @@
     pip install 'isaacsim[all,extscache]' --extra-index-url https://pypi.nvidia.com
 
     # Install IsaacLab
-    git clone git@github.com:isaac-sim/IsaacLab.git
+    git clone https://github.com/isaac-sim/IsaacLab.git
     sudo apt install cmake build-essential
     cd IsaacLab
     ./isaaclab.sh --install

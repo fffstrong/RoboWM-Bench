@@ -25,7 +25,7 @@ parser.add_argument(
     "--teleop_device",
     type=str,
     default="keyboard",
-    choices=["keyboard", "so101leader", "bi-so101leader"],
+    choices=["keyboard", "bi-keyboard", "so101leader", "bi-so101leader"],
     help="Device for interacting with environment",
 )
 parser.add_argument(
@@ -95,7 +95,7 @@ import json
 from isaaclab.envs import DirectRLEnv
 from isaaclab_tasks.utils import parse_env_cfg
 
-from lehome.devices import Se3Keyboard, SO101Leader, BiSO101Leader
+from lehome.devices import Se3Keyboard, SO101Leader, BiSO101Leader, BiKeyboard
 from lehome.utils.env_utils import dynamic_reset_gripper_effort_limit_sim
 from lehome.utils.record import get_next_experiment_path_with_gap, RateLimiter
 import numpy as np
@@ -130,9 +130,8 @@ def create_teleop_interface(env: DirectRLEnv, args: argparse.Namespace):
             right_port=args.right_arm_port,
             recalibrate=args.recalibrate,
         )
-    # NOTE: 双臂的键盘
-    # if args.teleop_device == "bi-keyboard":
-    #     return BiKeyboard(env, recalibrate=args.recalibrate)
+    if args.teleop_device == "bi-keyboard":
+        return BiKeyboard(env, sensitivity=0.25 * args.sensitivity)
     raise ValueError(
         f"Invalid device interface '{args.teleop_device}'. "
         f"Supported: 'keyboard', 'so101leader', 'bi-so101leader', 'bi-keyboard'."
@@ -297,7 +296,10 @@ def run_recording_phase(
 
             observations = env._get_observations()
             # 若禁用深度，则在保存前移除深度观测
-            if getattr(args, "disable_depth", False) and "observation.top_depth" in observations:
+            if (
+                getattr(args, "disable_depth", False)
+                and "observation.top_depth" in observations
+            ):
                 observations.pop("observation.top_depth")
             _, truncated = env._get_dones()
             # NOTE: 原代码里 task 写死为 "burger"，这里保持不变
