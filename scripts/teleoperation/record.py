@@ -1,120 +1,134 @@
-# Copyright (c) 2022-2025, The Isaac Lab Project Developers.
-# All rights reserved.
-#
-# SPDX-License-Identifier: BSD-3-Clause
-
-"""Script to run a lehome teleoperation with lehome manipulation environments."""
-
-"""Launch Isaac Sim Simulator first."""
 import multiprocessing
 
 if multiprocessing.get_start_method() != "spawn":
     multiprocessing.set_start_method("spawn", force=True)
+
 import argparse
-
-from isaaclab.app import AppLauncher
-
-# add argparse arguments
-parser = argparse.ArgumentParser(
-    description="lehome teleoperation for lehome environments."
-)
-parser.add_argument(
-    "--num_envs", type=int, default=1, help="Number of environments to simulate."
-)
-parser.add_argument(
-    "--teleop_device",
-    type=str,
-    default="keyboard",
-    choices=["keyboard", "so101leader", "bi-so101leader"],
-    help="Device for interacting with environment",
-)
-parser.add_argument(
-    "--port",
-    type=str,
-    default="/dev/ttyACM0",
-    help="Port for the teleop device:so101leader, default is /dev/ttyACM0",
-)
-parser.add_argument(
-    "--left_arm_port",
-    type=str,
-    default="/dev/ttyACM0",
-    help="Port for the left teleop device:bi-so101leader, default is /dev/ttyACM0",
-)
-parser.add_argument(
-    "--right_arm_port",
-    type=str,
-    default="/dev/ttyACM1",
-    help="Port for the right teleop device:bi-so101leader, default is /dev/ttyACM1",
-)
-parser.add_argument("--task", type=str, default=None, help="Name of the task.")
-parser.add_argument("--seed", type=int, default=42, help="Seed for the environment.")
-parser.add_argument(
-    "--sensitivity", type=float, default=1.0, help="Sensitivity factor."
-)
-# auto reset interval
-
-# recorder_parameter
-parser.add_argument(
-    "--record",
-    action="store_true",
-    default=False,
-    help="whether to enable record function",
-)
-parser.add_argument(
-    "--step_hz", type=int, default=60, help="Environment stepping rate in Hz."
-)
-parser.add_argument(
-    "--recalibrate",
-    action="store_true",
-    default=False,
-    help="recalibrate SO101-Leader or Bi-SO101Leader",
-)
-parser.add_argument("--num_episode", type=int, default=100, help="max num of episode ")
-parser.add_argument(
-    "--disable_depth",
-    action="store_true",
-    default=False,
-    help="Disable using top depth observation in env and dataset.",
-)
-# append AppLauncher cli args
-AppLauncher.add_app_launcher_args(parser)
-# parse the arguments
-args_cli = parser.parse_args()
-
-app_launcher_args = vars(args_cli)
-
-# launch omniverse app
-app_launcher = AppLauncher(app_launcher_args)
-simulation_app = app_launcher.app
-
-import os
-import torch
-from pathlib import Path
-import gymnasium as gym
 import json
+from pathlib import Path
+
+import gymnasium as gym
+import numpy as np
+import torch
+from isaaclab.app import AppLauncher
 from isaaclab.envs import DirectRLEnv
 from isaaclab_tasks.utils import parse_env_cfg
+from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
 from lehome.devices import Se3Keyboard, SO101Leader, BiSO101Leader
 from lehome.utils.env_utils import dynamic_reset_gripper_effort_limit_sim
 from lehome.utils.record import get_next_experiment_path_with_gap, RateLimiter
-import numpy as np
-from lerobot.datasets.lerobot_dataset import LeRobotDataset
+
+
+# ------------------------------------------------------------------------
+# 参数解析与应用启动
+# ------------------------------------------------------------------------
+
+
+def build_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="lehome teleoperation for lehome environments."
+    )
+    parser.add_argument(
+        "--num_envs",
+        type=int,
+        default=1,
+        help="Number of environments to simulate.",
+    )
+    parser.add_argument(
+        "--teleop_device",
+        type=str,
+        default="keyboard",
+        choices=["keyboard", "so101leader", "bi-so101leader"],
+        help="Device for interacting with environment",
+    )
+    parser.add_argument(
+        "--port",
+        type=str,
+        default="/dev/ttyACM0",
+        help="Port for the teleop device:so101leader, default is /dev/ttyACM0",
+    )
+    parser.add_argument(
+        "--left_arm_port",
+        type=str,
+        default="/dev/ttyACM0",
+        help="Port for the left teleop device:bi-so101leader, default is /dev/ttyACM0",
+    )
+    parser.add_argument(
+        "--right_arm_port",
+        type=str,
+        default="/dev/ttyACM1",
+        help="Port for the right teleop device:bi-so101leader, default is /dev/ttyACM1",
+    )
+    parser.add_argument("--task", type=str, default=None, help="Name of the task.")
+    parser.add_argument("--seed", type=int, default=42, help="Seed for the environment.")
+    parser.add_argument(
+        "--sensitivity",
+        type=float,
+        default=1.0,
+        help="Sensitivity factor.",
+    )
+    parser.add_argument(
+        "--record",
+        action="store_true",
+        default=False,
+        help="whether to enable record function",
+    )
+    parser.add_argument(
+        "--step_hz",
+        type=int,
+        default=60,
+        help="Environment stepping rate in Hz.",
+    )
+    parser.add_argument(
+        "--recalibrate",
+        action="store_true",
+        default=False,
+        help="recalibrate SO101-Leader or Bi-SO101Leader",
+    )
+    parser.add_argument(
+        "--num_episode",
+        type=int,
+        default=100,
+        help="max num of episode ",
+    )
+    # 追加 AppLauncher 的通用参数
+    AppLauncher.add_app_launcher_args(parser)
+    return parser
+
+
+def parse_args() -> argparse.Namespace:
+    parser = build_arg_parser()
+    return parser.parse_args()
+
+
+def create_sim_app(args: argparse.Namespace):
+    """创建并返回 (app_launcher, simulation_app)。"""
+    app_launcher = AppLauncher(vars(args))
+    simulation_app = app_launcher.app
+    return app_launcher, simulation_app
+
+
+# ------------------------------------------------------------------------
+# 环境 & Teleop 创建
+# ------------------------------------------------------------------------
 
 
 def validate_task_and_device(args: argparse.Namespace) -> None:
     """在环境创建前检查 task 与 teleop_device 是否匹配。"""
     if args.task is None:
         raise ValueError("Please specify --task.")
-    if "Bi" in args.task:
+    if "BiArm" in args.task:
         assert (
             args.teleop_device == "bi-so101leader"
-            or args.teleop_device == "bi-keyboard"
-        ), "only support bi-so101leader or bi-keyboardfor bi-arm task"
-    else:
-        assert (
-            args.teleop_device == "so101leader" or args.teleop_device == "keyboard"
-        ), "only support so101leader or keyboard for single-arm task"
+        ), "only support bi-so101leader for bi-arm task"
+
+
+def create_env(args: argparse.Namespace) -> DirectRLEnv:
+    """根据 task 配置创建环境。"""
+    env_cfg = parse_env_cfg(args.task, device=args.device)
+    env: DirectRLEnv = gym.make(args.task, cfg=env_cfg).unwrapped
+    return env
 
 
 def create_teleop_interface(env: DirectRLEnv, args: argparse.Namespace):
@@ -130,20 +144,23 @@ def create_teleop_interface(env: DirectRLEnv, args: argparse.Namespace):
             right_port=args.right_arm_port,
             recalibrate=args.recalibrate,
         )
-    # NOTE: 双臂的键盘
-    # if args.teleop_device == "bi-keyboard":
-    #     return BiKeyboard(env, recalibrate=args.recalibrate)
+
     raise ValueError(
         f"Invalid device interface '{args.teleop_device}'. "
-        f"Supported: 'keyboard', 'so101leader', 'bi-so101leader', 'bi-keyboard'."
+        f"Supported: 'keyboard', 'so101leader', 'bi-so101leader'."
     )
+
+
+# ------------------------------------------------------------------------
+# 回调 & 状态
+# ------------------------------------------------------------------------
 
 
 def register_teleop_callbacks(teleop_interface):
     """注册 S/N/D 三个按键的回调，并返回状态字典。"""
     flags = {
-        "start": False,  # S：开始录制
-        "success": False,  # N：成功/提前结束当前 episode
+        "start": False,   # S：开始录制
+        "success": False, # N：成功/提前结束当前 episode
         "remove": False,  # D：丢弃当前 episode
     }
 
@@ -163,12 +180,16 @@ def register_teleop_callbacks(teleop_interface):
     return flags
 
 
+# ------------------------------------------------------------------------
+# 数据集 / 录制相关
+# ------------------------------------------------------------------------
+
+
 def create_dataset_if_needed(args: argparse.Namespace):
     """若开启记录，则创建 LeRobotDataset，并返回 (dataset, jsonl_path)。"""
     if not args.record:
         return None, None
 
-    # 单臂每条手臂的 DoF 名称
     action_names = [
         "shoulder_pan",
         "shoulder_lift",
@@ -178,57 +199,38 @@ def create_dataset_if_needed(args: argparse.Namespace):
         "gripper",
     ]
 
-    # 判定单双臂（和 validate_task_and_device 保持一致）
-    is_bi_arm = ("Bi" in (args.task or "")) or (
-        getattr(args, "teleop_device", "") or ""
-    ).startswith("bi-")
-
-    # ---------- 关节 / 动作 feature ----------
-    if is_bi_arm:
-        left_names = [f"left_{n}" for n in action_names]
-        right_names = [f"right_{n}" for n in action_names]
-        joint_names = left_names + right_names
-    else:
-        joint_names = action_names
-
-    dim = len(joint_names)
-
     features = {
         "observation.state": {
             "dtype": "float32",
-            "shape": (dim,),
-            "names": joint_names,
+            "shape": (12,),
+            "names": action_names * 2,
         },
         "action": {
             "dtype": "float32",
-            "shape": (dim,),
-            "names": joint_names,
+            "shape": (12,),
+            "names": action_names * 2,
         },
-    }
-
-    # 根据参数决定是否记录深度
-    use_depth = not getattr(args, "disable_depth", False)
-    if use_depth:
-        features["observation.top_depth"] = {
-            "dtype": "float32",
-            "shape": (480, 640),
-            "names": ["height", "width"],
-        }
-
-    # ---------- 图像 feature：根据单双臂选择相机 ----------
-    if is_bi_arm:
-        # 例子：双臂用 top + left + right
-        image_keys = ["top_rgb", "left_rgb", "right_rgb"]
-    else:
-        # 例子：单臂只用 top + left（如果你单臂也有 right，就把它也加进来）
-        image_keys = ["top_rgb", "left_rgb"]
-
-    for key in image_keys:
-        features[f"observation.images.{key}"] = {
+        "observation.images.top_rgb": {
             "dtype": "video",
             "shape": (480, 640, 3),
             "names": ["height", "width", "channels"],
-        }
+        },
+        "observation.top_depth": {
+            "dtype": "float32",
+            "shape": (480, 640),
+            "names": ["height", "width"],
+        },
+        "observation.images.left_rgb": {
+            "dtype": "video",
+            "shape": (480, 640, 3),
+            "names": ["height", "width", "channels"],
+        },
+        "observation.images.right_rgb": {
+            "dtype": "video",
+            "shape": (480, 640, 3),
+            "names": ["height", "width", "channels"],
+        },
+    }
 
     root_path = Path("Datasets/record")
     dataset = LeRobotDataset.create(
@@ -242,6 +244,28 @@ def create_dataset_if_needed(args: argparse.Namespace):
     )
     jsonl_path = dataset.root / "meta" / "object_initial_pose.jsonl"
     return dataset, jsonl_path
+
+
+def _ndarray_to_list(obj):
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    if isinstance(obj, dict):
+        return {k: _ndarray_to_list(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_ndarray_to_list(x) for x in obj]
+    return obj
+
+
+def append_episode_initial_pose(jsonl_path: Path, episode_idx: int, object_initial_pose):
+    object_initial_pose = _ndarray_to_list(object_initial_pose)
+    rec = {"episode_idx": episode_idx, "object_initial_pose": object_initial_pose}
+    with open(jsonl_path, "a") as fout:
+        fout.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
+
+# ------------------------------------------------------------------------
+# 主循环阶段划分
+# ------------------------------------------------------------------------
 
 
 def run_idle_phase(env, teleop_interface, rate_limiter, args, count_render: int):
@@ -296,9 +320,6 @@ def run_recording_phase(
                 env.step(actions)
 
             observations = env._get_observations()
-            # 若禁用深度，则在保存前移除深度观测
-            if getattr(args, "disable_depth", False) and "observation.top_depth" in observations:
-                observations.pop("observation.top_depth")
             _, truncated = env._get_dones()
             # NOTE: 原代码里 task 写死为 "burger"，这里保持不变
             frame = {**observations, "task": "burger"}
@@ -322,8 +343,8 @@ def run_recording_phase(
 
         episode_index += 1
         env.reset()
-        # for _ in range(1000):
-        #     env.render()
+        for _ in range(1000):
+            env.render()
         object_initial_pose = env.get_all_pose()
 
     return object_initial_pose
@@ -346,41 +367,31 @@ def run_live_control_without_record(env, teleop_interface, rate_limiter, args):
         rate_limiter.sleep(env)
 
 
-def _ndarray_to_list(obj):
-    if isinstance(obj, np.ndarray):
-        return obj.tolist()
-    elif isinstance(obj, dict):
-        return {k: _ndarray_to_list(v) for k, v in obj.items()}
-    elif isinstance(obj, list):
-        return [_ndarray_to_list(x) for x in obj]
-    else:
-        return obj
+# ------------------------------------------------------------------------
+# main
+# ------------------------------------------------------------------------
 
 
-def append_episode_initial_pose(jsonl_path, episode_idx, object_initial_pose):
-    object_initial_pose = _ndarray_to_list(object_initial_pose)
-    rec = {"episode_idx": episode_idx, "object_initial_pose": object_initial_pose}
-    with open(jsonl_path, "a") as fout:
-        fout.write(json.dumps(rec, ensure_ascii=False) + "\n")
-
-
-def main():
+def main(args: argparse.Namespace | None = None):
     """Running lerobot teleoperation with lehome manipulation environment."""
-    env_cfg = parse_env_cfg(
-        args_cli.task,
-        device=args_cli.device,
-    )
-    task_name = args_cli.task
+    if args is None:
+        args = parse_args()
 
-    # create environment
-    env: DirectRLEnv = gym.make(task_name, cfg=env_cfg).unwrapped
-    teleop_interface = create_teleop_interface(env, args_cli)
+    validate_task_and_device(args)
+
+    app_launcher, simulation_app = create_sim_app(args)
+    env = create_env(args)
+    teleop_interface = create_teleop_interface(env, args)
     flags = register_teleop_callbacks(teleop_interface)
-    rate_limiter = RateLimiter(args_cli.step_hz)
+
+    rate_limiter = RateLimiter(args.step_hz)
     teleop_interface.reset()
-    dataset, jsonl_path = create_dataset_if_needed(args_cli)
+
+    dataset, jsonl_path = create_dataset_if_needed(args)
+
     count_render = 0
-    # simulate environment
+    object_initial_pose = None
+
     try:
         while simulation_app.is_running():
             with torch.inference_mode():
@@ -390,19 +401,19 @@ def main():
                         env,
                         teleop_interface,
                         rate_limiter,
-                        args_cli,
+                        args,
                         count_render,
                     )
                     if pose is not None:
                         object_initial_pose = pose
 
-                elif args_cli.record and dataset is not None:
+                elif args.record and dataset is not None:
                     # 录制阶段：阻塞直到录完 num_episode
                     object_initial_pose = run_recording_phase(
                         env,
                         teleop_interface,
                         rate_limiter,
-                        args_cli,
+                        args,
                         flags,
                         dataset,
                         jsonl_path,
@@ -415,18 +426,16 @@ def main():
                 else:
                     # 已按 S 但未开启录制：只进行正常遥操作
                     run_live_control_without_record(
-                        env, teleop_interface, rate_limiter, args_cli
+                        env, teleop_interface, rate_limiter, args
                     )
 
-    finally:
+        # 如果需要推送到 Hub，可以在这里处理
         # if cfg.push_to_hub:
         #     dataset.push_to_hub()
-
-        # close the simulator
+    finally:
         env.close()
         simulation_app.close()
 
 
 if __name__ == "__main__":
-    # run the main function
     main()

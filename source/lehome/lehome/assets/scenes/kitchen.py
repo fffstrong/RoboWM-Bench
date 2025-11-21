@@ -9,7 +9,7 @@ from isaaclab.assets import AssetBaseCfg
 """Configuration for the Kitchen Scene"""
 SCENES_ROOT = Path(ASSETS_ROOT)
 
-KITCHEN_WITH_ORANGE_USD_PATH = str(SCENES_ROOT / "scenes" / "kitchen_with_orange" / "scene.usd")
+KITCHEN_WITH_ORANGE_USD_PATH = str(SCENES_ROOT / "scenes" / "kitchen_with_orange" / "scene_v1.usd")
 
 KITCHEN_WITH_ORANGE_CFG = AssetBaseCfg(
     spawn=sim_utils.UsdFileCfg(

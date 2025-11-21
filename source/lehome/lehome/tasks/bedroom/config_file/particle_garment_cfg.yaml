@@ -9,9 +9,9 @@ room:
 objects:
   # Path to folder containing USD files (e.g., cube.usd, cone.usd)
   common:
-    initial_pos_range: [1.4, -2.6, 0.63, 1.4, -2.6, 0.63]  #[128.81421, 62.60039, 263, 128.81421, 62.60039, 263]
+    initial_pos_range: [1.4, -2.6, 0.62, 1.4, -2.6, 0.62]  #[128.81421, 62.60039, 263, 128.81421, 62.60039, 263]
     initial_rot_range: [0, 0, 0, 0, 0, 0]  #[0, 0, 0, 0, 0, 0] 
-    soft_reset_pos_range: [1.38, -2.61, 0.63, 1.42, -2.59, 0.63] 
+    soft_reset_pos_range: [1.39, -2.61, 0.62, 1.41, -2.59, 0.62] 
     soft_reset_rot_range: [0, 0, -1, 0, 0, 1] 
     scale: [0.45, 0.45, 0.45]
   # Object-specific configurations (override common settings)

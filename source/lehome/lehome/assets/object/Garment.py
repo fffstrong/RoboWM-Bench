@@ -239,8 +239,9 @@ class GarmentObject(SingleClothPrim):
             random.uniform(rot_reset_range[1], rot_reset_range[4]),
             random.uniform(rot_reset_range[2], rot_reset_range[5]),
         ]
-        # Reset object position and orientation
-
+        xw, yw, zw = pos
+        pos = [100.0 * xw, 100.0 * zw, -100.0 * yw]
+        ori = [ori[0] - 90.0, ori[1], ori[2]]
         self.num_count += 1
         self.set_local_pose(pos, euler_angles_to_quat(ori, degrees=True))
         self.reset_pose = np.concatenate(
@@ -371,6 +372,9 @@ class GarmentObject(SingleClothPrim):
             random.uniform(rot_init_range[1], rot_init_range[4]),
             random.uniform(rot_init_range[2], rot_init_range[5]),
         ]
+        xw, yw, zw = pos
+        pos = [100.0 * xw, 100.0 * zw, -100.0 * yw]
+        ori = [ori[0] - 90.0, ori[1], ori[2]]
         scale = self.objects_config.common.scale
         self.reset_pose = np.concatenate(
             [np.array(pos, dtype=np.float32), np.array(ori, dtype=np.float32)]

@@ -37,13 +37,21 @@ SO101_FOLLOWER_CFG = ArticulationCfg(
         pos=(1.4, -2.3, 0),
         rot=(0.0, 0.0, 0.0, 1.0),
         joint_pos={
-            "shoulder_pan": -0.0363,
-            "shoulder_lift": -1.7135,
-            "elbow_flex": 1.4979,
-            "wrist_flex": 1.0534,
-            "wrist_roll": -0.085,
-            "gripper": -0.01176,
+            "shoulder_pan": 0.0,
+            "shoulder_lift": 0.0,
+            "elbow_flex": 0.0,
+            "wrist_flex": 0.0,
+            "wrist_roll": 0.0,
+            "gripper": 0.0,
         },
+        # joint_pos={
+        #     "shoulder_pan": -0.0363,
+        #     "shoulder_lift": -1.7135,
+        #     "elbow_flex": 1.4979,
+        #     "wrist_flex": 1.0534,
+        #     "wrist_roll": -0.085,
+        #     "gripper": -0.01176,
+        # },
     ),
     actuators={
         "sts3215-gripper": ImplicitActuatorCfg(

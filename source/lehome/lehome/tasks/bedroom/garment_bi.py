@@ -48,10 +48,10 @@ class GarmentEnv(DirectRLEnv):
             orientation=(0.0, 0.0, 0.0, 0.0),
         )
         self.object = GarmentObject(
-            prim_path="/World/Cloth",
+            prim_path="/World/Object/Cloth",
             usd_path=os.getcwd()
             + "/Assets/objects/garment/Tops/Collar_Lsleeve_FrontClose/TCLC_002/TCLC_002_obj.usd",
-            visual_usd_path=os.getcwd() + "/Assets/Material/Garment/linen_Blue.usd",
+            visual_usd_path=None, #os.getcwd() + "/Assets/Material/Garment/linen_Blue.usd",
             config=OmegaConf.load(
                 "source/lehome/lehome/tasks/bedroom/config_file/particle_garment_cfg.yaml"
             ),
