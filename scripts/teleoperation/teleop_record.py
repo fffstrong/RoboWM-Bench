@@ -139,11 +139,12 @@ def create_teleop_interface(env: DirectRLEnv, args: argparse.Namespace):
 
 
 def register_teleop_callbacks(teleop_interface):
-    """注册 S/N/D 三个按键的回调，并返回状态字典。"""
+    """注册 S/N/D/ESC 四个按键的回调，并返回状态字典。"""
     flags = {
         "start": False,  # S：开始录制
         "success": False,  # N：成功/提前结束当前 episode
         "remove": False,  # D：丢弃当前 episode
+        "abort": False,  # ESC：中止整个录制过程，清空当前 buffer
     }
 
     def on_start():
@@ -155,9 +156,14 @@ def register_teleop_callbacks(teleop_interface):
     def on_remove():
         flags["remove"] = True
 
+    def on_abort():
+        flags["abort"] = True
+        print("\n[ESC] 中止录制，正在清空当前 episode buffer...")
+
     teleop_interface.add_callback("S", on_start)
     teleop_interface.add_callback("N", on_success)
     teleop_interface.add_callback("D", on_remove)
+    teleop_interface.add_callback("ESCAPE", on_abort)
 
     return flags
 
@@ -281,11 +287,25 @@ def run_recording_phase(
     object_initial_pose = initial_object_pose
 
     while episode_index < args.num_episode:
+        # 检查是否需要中止录制
+        if flags["abort"]:
+            dataset.clear_episode_buffer()
+            dataset.finalize()
+            print(f"已中止录制，共完成 {episode_index} 条 episode")
+            return object_initial_pose
+
         flags["success"] = False
         flags["remove"] = False
 
         # 单个 episode 内循环
         while not flags["success"]:
+            # 检查是否需要中止录制
+            if flags["abort"]:
+                dataset.clear_episode_buffer()
+                dataset.finalize()
+                print(f"已中止录制，共完成 {episode_index} 条 episode")
+                return object_initial_pose
+
             dynamic_reset_gripper_effort_limit_sim(env, args.teleop_device)
             actions = teleop_interface.advance()
 
@@ -323,11 +343,13 @@ def run_recording_phase(
         append_episode_initial_pose(jsonl_path, episode_index, object_initial_pose)
 
         episode_index += 1
+        print(f"Episode {episode_index - 1} 录制完成，进度: {episode_index}/{args.num_episode}")
         env.reset()
         # for _ in range(1000):
         #     env.render()
         object_initial_pose = env.get_all_pose()
 
+    print(f"所有 {args.num_episode} 条 episode 录制完成！")
     return object_initial_pose
 
 
@@ -420,6 +442,15 @@ def main():
                         env, teleop_interface, rate_limiter, args_cli
                     )
 
+    except KeyboardInterrupt:
+        print("\n[Ctrl+C] 检测到中断信号")
+        # 如果在录制过程中按 Ctrl+C，清空当前 buffer
+        if args_cli.record and dataset is not None and flags["start"]:
+            print("清空当前 episode buffer...")
+            dataset.clear_episode_buffer()
+            print("Buffer 已清空，数据集保持完整性")
+            dataset.finalize()
+            print("数据集已保存")
     finally:
         # if cfg.push_to_hub:
         #     dataset.push_to_hub()

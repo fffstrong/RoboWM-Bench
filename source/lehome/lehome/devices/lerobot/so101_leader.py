@@ -2,7 +2,7 @@ import os
 import json
 from collections.abc import Callable
 from typing import Dict, Tuple
-from pynput.keyboard import Listener
+from pynput.keyboard import Listener, Key
 
 from .common.motors import (
     FeetechMotorsBus,
@@ -88,6 +88,7 @@ class SO101Leader(Device):
         print_command("s", "start record")
         print_command("d", "delete the episode")
         print_command("n", "save the episode")
+        print_command("ESC", "abort recording and clear buffer")
         print_command("move leader", "control follower in the simulation")
         print_command("Control+C", "quit")
         print("")
@@ -118,7 +119,10 @@ class SO101Leader(Device):
                 if self.other_key_enable == True:
                     self._additional_callbacks["D"]()
         except AttributeError:
-            pass
+            # Handle special keys (like ESC)
+            if key == Key.esc and "ESCAPE" in self._additional_callbacks:
+                if self.other_key_enable == True:
+                    self._additional_callbacks["ESCAPE"]()
 
     def get_device_state(self):
         return self._bus.sync_read("Present_Position")

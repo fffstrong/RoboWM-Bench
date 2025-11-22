@@ -2,7 +2,7 @@ import weakref
 import numpy as np
 
 from collections.abc import Callable
-from pynput.keyboard import Listener
+from pynput.keyboard import Listener, Key
 
 import carb
 import omni
@@ -100,6 +100,7 @@ class BiKeyboard(Device):
         msg += "\tStart Control: B\n"
         msg += "\tTask Failed and Reset: R\n"
         msg += "\tTask Success and Reset: N\n"
+        msg += "\tAbort Recording: ESC\n"
         msg += "\tControl+C: quit"
         return msg
 
@@ -125,7 +126,9 @@ class BiKeyboard(Device):
                 self._reset_state = True
                 self._additional_callbacks["N"]()
         except AttributeError:
-            pass
+            # Handle special keys (like ESC)
+            if key == Key.esc and "ESCAPE" in self._additional_callbacks:
+                self._additional_callbacks["ESCAPE"]()
 
     def get_device_state(self):
         return {
