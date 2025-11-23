@@ -61,7 +61,7 @@ parser.add_argument(
     help="whether to enable record function",
 )
 parser.add_argument(
-    "--step_hz", type=int, default=60, help="Environment stepping rate in Hz."
+    "--step_hz", type=int, default=120, help="Environment stepping rate in Hz."
 )
 parser.add_argument(
     "--recalibrate",
@@ -69,12 +69,18 @@ parser.add_argument(
     default=False,
     help="recalibrate SO101-Leader or Bi-SO101Leader",
 )
-parser.add_argument("--num_episode", type=int, default=100, help="max num of episode ")
+parser.add_argument("--num_episode", type=int, default=20, help="max num of episode ")
 parser.add_argument(
     "--disable_depth",
     action="store_true",
     default=False,
     help="Disable using top depth observation in env and dataset.",
+)
+parser.add_argument(
+    "--task_description",
+    type=str,
+    default="fold the garment on the table",
+    help=" Description of the task to be performed.",
 )
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
@@ -97,7 +103,11 @@ from isaaclab_tasks.utils import parse_env_cfg
 
 from lehome.devices import Se3Keyboard, SO101Leader, BiSO101Leader, BiKeyboard
 from lehome.utils.env_utils import dynamic_reset_gripper_effort_limit_sim
-from lehome.utils.record import get_next_experiment_path_with_gap, RateLimiter
+from lehome.utils.record import (
+    get_next_experiment_path_with_gap,
+    RateLimiter,
+    append_episode_initial_pose,
+)
 import numpy as np
 from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
@@ -323,7 +333,7 @@ def run_recording_phase(
                 observations.pop("observation.top_depth")
             _, truncated = env._get_dones()
             # NOTE: 原代码里 task 写死为 "burger"，这里保持不变
-            frame = {**observations, "task": "burger"}
+            frame = {**observations, "task": args.task_description}
             dataset.add_frame(frame)
 
             if rate_limiter:
@@ -343,7 +353,9 @@ def run_recording_phase(
         append_episode_initial_pose(jsonl_path, episode_index, object_initial_pose)
 
         episode_index += 1
-        print(f"Episode {episode_index - 1} 录制完成，进度: {episode_index}/{args.num_episode}")
+        print(
+            f"Episode {episode_index - 1} 录制完成，进度: {episode_index}/{args.num_episode}"
+        )
         env.reset()
         # for _ in range(1000):
         #     env.render()
@@ -368,24 +380,6 @@ def run_live_control_without_record(env, teleop_interface, rate_limiter, args):
 
     if rate_limiter:
         rate_limiter.sleep(env)
-
-
-def _ndarray_to_list(obj):
-    if isinstance(obj, np.ndarray):
-        return obj.tolist()
-    elif isinstance(obj, dict):
-        return {k: _ndarray_to_list(v) for k, v in obj.items()}
-    elif isinstance(obj, list):
-        return [_ndarray_to_list(x) for x in obj]
-    else:
-        return obj
-
-
-def append_episode_initial_pose(jsonl_path, episode_idx, object_initial_pose):
-    object_initial_pose = _ndarray_to_list(object_initial_pose)
-    rec = {"episode_idx": episode_idx, "object_initial_pose": object_initial_pose}
-    with open(jsonl_path, "a") as fout:
-        fout.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
 
 def main():

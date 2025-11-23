@@ -60,7 +60,7 @@ objects:
     folder: "Assets/textures/surface/seen"
     min_id: 1
     max_id: 10000
-    prim_path: "/World/Scene/Table038/looks/M_Table038a/UsdPreviewSurface/________7/________7"
+    prim_path: "/World/Scene/scene/Table038/looks/M_Table038a/UsdPreviewSurface/________7/________7"
 
   # Light randomization configuration
   light_randomization:

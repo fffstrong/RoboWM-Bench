@@ -37,7 +37,7 @@
 
 | 参数 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| `--task` | str | 必需 | 任务名称，如 `LeHome-SO101-Direct-Grament-v0` |
+| `--task` | str | 必需 | 任务名称，如 `LeHome-SO101-Direct-Garment-v0` |
 | `--num_envs` | int | 1 | 并行环境数量 |
 | `--seed` | int | 42 | 随机种子 |
 
@@ -60,7 +60,7 @@
 | `--num_episode` | int | 100 | 最大录制 episode 数量 |
 | `--step_hz` | int | 60 | 环境步进频率（Hz） |
 | `--disable_depth` | flag | False | 禁用深度图录制 |
-
+| `--task_description` | str | abc | 任务描述 |
 ### AppLauncher 参数
 
 | 参数 | 类型 | 默认值 | 说明 |
@@ -146,11 +146,12 @@ cd /home/glzn/project/lehome
 
 ```bash
 python scripts/teleoperation/teleop_record.py \
-    --task LeHome-SO101-Direct-v0 \
+    --task LeHome-SO101-Direct-Garment-v0 \
     --teleop_device keyboard \
     --record \
     --num_episode 10 \
-    --step_hz 60
+    --step_hz 60 \
+    --enable_cameras
 ```
 
 **操作步骤：**
@@ -167,51 +168,55 @@ python scripts/teleoperation/teleop_record.py \
 
 ```bash
 python scripts/teleoperation/teleop_record.py \
-    --task LeHome-SO101-Direct-v0 \
+    --task LeHome-SO101-Direct-Garment-v0 \
     --teleop_device so101leader \
     --port /dev/ttyACM0 \
     --record \
-    --num_episode 10
+    --num_episode 10 \
+    --enable_cameras
 ```
 
 **首次使用需要校准：**
 ```bash
 python scripts/teleoperation/teleop_record.py \
-    --task LeHome-SO101-Direct-v0 \
+    --task LeHome-SO101-Direct-Garment-v0 \
     --teleop_device so101leader \
     --port /dev/ttyACM0 \
     --recalibrate \
     --record \
-    --num_episode 10
+    --num_episode 10 \
+    --enable_cameras
 ```
 
 ### 4. 双臂任务 - 键盘录制
 
 ```bash
 python scripts/teleoperation/teleop_record.py \
-    --task LeHome-BiSO101-Direct-v0 \
+    --task LeHome-BiSO101-Direct-Garment-v0 \
     --teleop_device bi-keyboard \
     --record \
-    --num_episode 10
+    --num_episode 10 \
+    --enable_cameras
 ```
 
 ### 5. 双臂任务 - SO101 Leader 录制
 
 ```bash
 python scripts/teleoperation/teleop_record.py \
-    --task LeHome-BiSO101-Direct-v0 \
+    --task LeHome-BiSO101-Direct-Garment-v0 \
     --teleop_device bi-so101leader \
     --left_arm_port /dev/ttyACM0 \
     --right_arm_port /dev/ttyACM1 \
     --record \
-    --num_episode 10
+    --num_episode 10 \
+    -- --enable_cameras
 ```
 
 ### 6. 无深度图录制（加快速度）
 
 ```bash
 python scripts/teleoperation/teleop_record.py \
-    --task LeHome-SO101-Direct-v0 \
+    --task LeHome-SO101-Direct-Garment-v0 \
     --teleop_device keyboard \
     --record \
     --disable_depth \
@@ -310,7 +315,7 @@ python scripts/teleoperation/teleop_record.py --step_hz 60 ...
 
 **A**: 使用 `replay.py` 脚本：
 ```bash
-python scripts/tool/replay.py --dataset_path Datasets/record/024
+python scripts/tool/replay.py --dataset_path Datasets/record/024 --enable_cameras
 ```
 
 详见 `scripts/tool/README_REPLAY.md`。
@@ -376,4 +381,6 @@ python scripts/tool/replay.py --dataset_path Datasets/record/024
 
 
 **Happy Recording! 🎉**
+
+
 

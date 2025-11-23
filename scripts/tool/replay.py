@@ -69,7 +69,12 @@ parser.add_argument(
     default=None,
     help="Ending episode index (exclusive). If None, replay all episodes.",
 )
-
+parser.add_argument(
+    "--task_description",
+    type=str,
+    default="fold the garment on the table",
+    help=" Description of the task to be performed.",
+)
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 app_launcher = AppLauncher(vars(args_cli))
@@ -103,8 +108,7 @@ def validate_args(args: argparse.Namespace) -> None:
 def load_dataset(dataset_root: str) -> LeRobotDataset:
     """Load the LeRobotDataset from the specified root directory."""
     print(f"[Info] Loading dataset from: {dataset_root}")
-    dataset = LeRobotDataset(
-        repo_id="replay_source", root=dataset_root)
+    dataset = LeRobotDataset(repo_id="replay_source", root=dataset_root)
     print(
         f"[Info] Dataset loaded: {dataset.num_episodes} episodes, {dataset.num_frames} frames"
     )
@@ -202,8 +206,8 @@ def replay_episode(
                     for k, v in observations.items()
                     if k != "observation.top_depth"
                 }
-
-            replay_dataset.add_frame(observations)
+            frame = {**observations, "task": args.task_description}
+            replay_dataset.add_frame(frame)
 
         # Check for success
         success = env._get_success().item()
@@ -271,85 +275,81 @@ def main():
     total_successes = 0
     saved_episodes = 0
 
-    try:
-        # Iterate through episodes
-        for episode_idx in range(start_idx, end_idx):
-            print(f"\n{'='*60}")
-            print(f"[Episode {episode_idx}/{end_idx-1}]")
-            print(f"{'='*60}")
-
-            # Load initial pose
-            initial_pose = load_initial_pose(args_cli.dataset_root, episode_idx)
-
-            # Filter episode data
-            episode_data = dataset.hf_dataset.filter(
-                lambda x: x["episode_index"].item() == episode_idx
-            )
-
-            if len(episode_data) == 0:
-                print(f"[Warning] Episode {episode_idx} has no data, skipping...")
-                continue
-
-            print(f"[Info] Episode length: {len(episode_data)} frames")
-
-            # Replay multiple times if requested
-            for replay_idx in range(args_cli.num_replays):
-                total_attempts += 1
-
-                print(f"[Replay {replay_idx + 1}/{args_cli.num_replays}]", end=" ")
-
-                # Clear buffer if saving
-                if replay_dataset is not None:
-                    replay_dataset.clear_episode_buffer()
-
-                # Replay the episode
-                success = replay_episode(
-                    env=env,
-                    episode_data=episode_data,
-                    rate_limiter=rate_limiter,
-                    initial_pose=initial_pose,
-                    args=args_cli,
-                    replay_dataset=replay_dataset,
-                    disable_depth=args_cli.disable_depth,
-                )
-
-                if success:
-                    total_successes += 1
-                    print("✓ Success")
-                else:
-                    print("✗ Failed")
-
-                # Save episode if conditions are met
-                should_save = replay_dataset is not None and (
-                    not args_cli.save_successful_only or success
-                )
-
-                if should_save:
-                    replay_dataset.save_episode()
-                    append_episode_initial_pose(
-                        jsonl_path, saved_episodes, initial_pose
-                    )
-                    saved_episodes += 1
-                    print(f"  → Saved as episode {saved_episodes - 1}")
-                elif replay_dataset is not None:
-                    replay_dataset.clear_episode_buffer()
-
-    finally:
-        # Print statistics
+    # Iterate through episodes
+    for episode_idx in range(start_idx, end_idx):
         print(f"\n{'='*60}")
-        print("[Statistics]")
-        print(f"  Total attempts: {total_attempts}")
-        print(f"  Total successes: {total_successes}")
-        if total_attempts > 0:
-            print(f"  Success rate: {100.0 * total_successes / total_attempts:.1f}%")
-        if replay_dataset is not None:
-            print(f"  Saved episodes: {saved_episodes}")
+        print(f"[Episode {episode_idx}/{end_idx-1}]")
         print(f"{'='*60}")
 
-        # Cleanup
-        env.close()
-        simulation_app.close()
-        print("[Info] Cleanup completed successfully.")
+        # Load initial pose
+        initial_pose = load_initial_pose(args_cli.dataset_root, episode_idx)
+
+        # Filter episode data
+        episode_data = dataset.hf_dataset.filter(
+            lambda x: x["episode_index"].item() == episode_idx
+        )
+
+        if len(episode_data) == 0:
+            print(f"[Warning] Episode {episode_idx} has no data, skipping...")
+            continue
+
+        print(f"[Info] Episode length: {len(episode_data)} frames")
+
+        # Replay multiple times if requested
+        for replay_idx in range(args_cli.num_replays):
+            total_attempts += 1
+
+            print(f"[Replay {replay_idx + 1}/{args_cli.num_replays}]", end=" ")
+
+            # Clear buffer if saving
+            if replay_dataset is not None:
+                replay_dataset.clear_episode_buffer()
+
+            # Replay the episode
+            success = replay_episode(
+                env=env,
+                episode_data=episode_data,
+                rate_limiter=rate_limiter,
+                initial_pose=initial_pose,
+                args=args_cli,
+                replay_dataset=replay_dataset,
+                disable_depth=args_cli.disable_depth,
+            )
+
+            if success:
+                total_successes += 1
+                print("✓ Success")
+            else:
+                print("✗ Failed")
+
+            # Save episode if conditions are met
+            should_save = replay_dataset is not None and (
+                not args_cli.save_successful_only or success
+            )
+
+            if should_save:
+                replay_dataset.save_episode()
+                append_episode_initial_pose(jsonl_path, saved_episodes, initial_pose)
+                saved_episodes += 1
+                print(f"  → Saved as episode {saved_episodes - 1}")
+            elif replay_dataset is not None:
+                replay_dataset.clear_episode_buffer()
+
+    # Print statistics
+    print(f"\n{'='*60}")
+    print("[Statistics]")
+    print(f"  Total attempts: {total_attempts}")
+    print(f"  Total successes: {total_successes}")
+    if total_attempts > 0:
+        print(f"  Success rate: {100.0 * total_successes / total_attempts:.1f}%")
+    if replay_dataset is not None:
+        print(f"  Saved episodes: {saved_episodes}")
+    print(f"{'='*60}")
+
+    # Cleanup
+    env.close()
+    simulation_app.close()
+    print("[Info] Cleanup completed successfully.")
 
 
 if __name__ == "__main__":
