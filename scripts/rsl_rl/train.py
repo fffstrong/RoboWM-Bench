@@ -40,6 +40,12 @@ cli_args.add_rsl_rl_args(parser)
 AppLauncher.add_app_launcher_args(parser)
 args_cli, hydra_args = parser.parse_known_args()
 
+# Enable cameras by default for tasks that use cameras
+# This prevents RuntimeError when cameras are spawned in task setup
+# Note: Tasks may create cameras even when only using state observations
+# Users can override this by explicitly passing --enable_cameras=False
+if not hasattr(args_cli, 'enable_cameras'):
+    args_cli.enable_cameras = True
 # always enable cameras to record video
 if args_cli.video:
     args_cli.enable_cameras = True

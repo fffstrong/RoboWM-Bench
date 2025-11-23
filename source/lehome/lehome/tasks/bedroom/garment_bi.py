@@ -109,9 +109,13 @@ class GarmentEnv(DirectRLEnv):
             "observation.top_depth": top_camera_depth.cpu().detach().numpy(),
         }
         return observations
-
+    
     def _get_rewards(self) -> torch.Tensor:
-        total_reward = 0
+        success = success_checker_fold(self.object)
+        if success:
+            total_reward = 1
+        else:
+            total_reward = 0
         return total_reward
 
     def _get_dones(self) -> tuple[torch.Tensor, torch.Tensor]:
