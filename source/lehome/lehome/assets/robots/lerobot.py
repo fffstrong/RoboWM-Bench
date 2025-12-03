@@ -8,7 +8,7 @@ from lehome.utils.constant import ASSETS_ROOT
 
 
 """Configuration for the SO101 Follower Robot."""
-SO101_FOLLOWER_ASSET_PATH = Path(ASSETS_ROOT) / "robots" / "so101_follower.usd"
+SO101_FOLLOWER_ASSET_PATH = Path(ASSETS_ROOT) / "robots" / "so101_follower_good.usd"
 SO101_KINFE_ASSET_PATH = Path(ASSETS_ROOT) / "robots" / "so101_knife.usd"
 
 ACTION_NAMES = [
@@ -28,8 +28,8 @@ SO101_FOLLOWER_CFG = ArticulationCfg(
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
             enabled_self_collisions=True,
-            solver_position_iteration_count=4,
-            solver_velocity_iteration_count=4,
+            solver_position_iteration_count=16,
+            solver_velocity_iteration_count=16,
             fix_root_link=True,
         ),
     ),

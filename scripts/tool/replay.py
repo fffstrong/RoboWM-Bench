@@ -75,6 +75,13 @@ parser.add_argument(
     default="fold the garment on the table",
     help=" Description of the task to be performed.",
 )
+parser.add_argument(
+    "--garment_type",
+    type=str,
+    default=None,
+    choices=["top-long-sleeve", "top-short-sleeve", "short-pant", "long-pant"],
+    help="Type of garment to use for replay (optional). If not specified, will use the garment type from the original recording.",
+)
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 app_launcher = AppLauncher(vars(args_cli))
@@ -248,6 +255,14 @@ def main():
     # Create environment
     print(f"[Info] Creating environment: {args_cli.task}")
     env_cfg = parse_env_cfg(args_cli.task, device=args_cli.device)
+    
+    # Set garment configuration if specified (optional for replay)
+    if args_cli.garment_type is not None:
+        if hasattr(env_cfg, 'garment_type'):
+            env_cfg.garment_type = args_cli.garment_type
+        if hasattr(env_cfg, 'garment_index'):
+            env_cfg.garment_index = None  # Use recorded initial pose, so keep None
+    
     env: DirectRLEnv = gym.make(args_cli.task, cfg=env_cfg).unwrapped
 
     # Initialize observations

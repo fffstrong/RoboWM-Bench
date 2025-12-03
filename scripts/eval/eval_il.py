@@ -87,6 +87,13 @@ parser.add_argument(
     default="Datasets/record/030",
     help="Path of the train dataset.",
 )
+parser.add_argument(
+    "--garment_type",
+    type=str,
+    default="top-long-sleeve",
+    choices=["top-long-sleeve", "top-short-sleeve", "short-pant", "long-pant"],
+    help="Type of garment to use: top-long-sleeve, top-short-sleeve, short-pant, long-pant",
+)
 
 AppLauncher.add_app_launcher_args(parser)
 
@@ -320,6 +327,12 @@ def main():
 
     # Parse environment configuration
     env_cfg = parse_env_cfg(args_cli.task, device=args_cli.device)
+
+    # Set garment_type in env_cfg (garment_index=None for random selection in eval)
+    if hasattr(env_cfg, 'garment_type'):
+        env_cfg.garment_type = args_cli.garment_type
+    if hasattr(env_cfg, 'garment_index'):
+        env_cfg.garment_index = None  # Random selection for eval
 
     task_name = args_cli.task
     if "BiArm" in task_name:

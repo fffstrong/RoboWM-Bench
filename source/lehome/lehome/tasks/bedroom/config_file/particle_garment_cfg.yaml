@@ -20,12 +20,12 @@ objects:
   particle_system:
     particle_system_enabled: True
     enable_ccd: True
-    solver_position_iteration_count: 24
+    solver_position_iteration_count: 32
     max_depenetration_velocity: null
     global_self_collision_enabled: True
     non_particle_collision_enabled: True
-    contact_offset: 0.005
-    rest_offset: 0.0025
+    contact_offset: 0.008
+    rest_offset: 0.004
     particle_contact_offset: 0.005
     fluid_rest_offset: 0.0025
     solid_rest_offset: 0.0025
@@ -42,7 +42,7 @@ objects:
     lift: 0.0
     friction: 1.0
     damping: 0.05
-    gravity_scale: 2.0
+    gravity_scale: 1.5
     viscosity: null
     vorticity_confinement: null
     surface_tension: null
