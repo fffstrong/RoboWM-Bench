@@ -107,3 +107,4 @@ python scripts/tool/replay.py \
 3. 如果数据集没有 `object_initial_pose.jsonl`，将使用环境默认初始状态
 4. 成功判断由环境的 `_get_success()` 方法决定
 
+

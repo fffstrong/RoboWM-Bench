@@ -26,12 +26,3 @@ gym.register(
         "env_cfg_entry_point": f"{__name__}.garment_bi_cfg_v2:GarmentEnvCfg",
     },
 )
-
-gym.register(
-    id="LeHome-BiSO101-Direct-Marbel-v0",
-    entry_point=f"{__name__}.test_bi:MarbelEnv",
-    disable_env_checker=True,
-    kwargs={
-        "env_cfg_entry_point": f"{__name__}.test_bi_cfg:MarbelEnvCfg",
-    },
-)

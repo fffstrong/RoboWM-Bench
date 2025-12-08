@@ -33,7 +33,7 @@ import os
 
 
 class GarmentEnv(DirectRLEnv):
-    cfg: GarmentEnvCfg  
+    cfg: GarmentEnvCfg
 
     def __init__(self, cfg: GarmentEnvCfg, render_mode: str | None = None, **kwargs):
         self.cfg = cfg
@@ -63,7 +63,7 @@ class GarmentEnv(DirectRLEnv):
         super().__init__(cfg, render_mode, **kwargs)
         self.left_joint_pos = self.left_arm.data.joint_pos
         self.right_joint_pos = self.right_arm.data.joint_pos
-        
+
     def _select_garment_asset(self):
         """Select garment asset based on garment_index config.
         If garment_index is None (eval mode), randomly select from available assets.

@@ -151,7 +151,8 @@ def interactive_select_garment(garment_type: str) -> int:
         Selected garment index (0-4)
     """
     assets = GARMENT_ASSETS.get(garment_type, [])
-    if len(assets) == 0:garment_type
+    if len(assets) == 0:
+        garment_type
     print(f"{'='*60}")
     for i, asset_path in enumerate(assets):
         # Extract garment name from path
