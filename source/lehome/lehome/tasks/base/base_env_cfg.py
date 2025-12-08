@@ -34,4 +34,4 @@ class BaseEnvCfg(DirectRLEnvCfg):
     # viewer
     viewer: ViewerCfg = ViewerCfg(eye=(1.9, -4.7, 1.4), lookat=(1.3, 1.2, -1))
 
-    path_scene: str = os.getcwd() + "/Assets/LW_Loft/LW_Loft.usd"
+    path_scene: str = os.getcwd() + "/Assets/scenes/LW_Loft/LW_Loft.usd"

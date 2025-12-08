@@ -26,3 +26,12 @@ gym.register(
         "env_cfg_entry_point": f"{__name__}.garment_bi_cfg_v2:GarmentEnvCfg",
     },
 )
+
+gym.register(
+    id="LeIsaac-BiSO101-Direct-Garment-fling-v0",
+    entry_point=f"{__name__}.garment_fling_bi:GarmentEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.garment_fling_bi_cfg:GarmentEnvCfg",
+    },
+)

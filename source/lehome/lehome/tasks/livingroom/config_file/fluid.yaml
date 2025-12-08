@@ -1,0 +1,73 @@
+objects:
+  common:
+    initial_pos_range: [ 2.7, 0.73 ,0.91, 2.7, 0.73 ,0.91]
+    initial_ori_range: [0, 0, 60, 0, 0, 60]
+    soft_reset_pos_range: [ 2.7, 0.73 ,0.91, 2.7, 0.73 ,0.91]
+    soft_reset_ori_range: [0, 0, 60, 0, 0, 60]
+    scale: [1.5, 1.5, 1.5]
+
+  fluid_items:
+    common:
+    usd: ["XXX.usd"]
+    num_per_env: 1
+    random: True
+    interaction_with_object: False
+
+    fluid_items_1:
+      visual:
+        scale: [1.5,1.5,1.5]
+        container_scale: [2.0,2.0,2.0]
+        visual_material:
+          material_usd_folder: [
+            # "/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Textiles/Linen_Beige.mdl",
+            # "/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Textiles/Linen_White.mdl",
+            # "/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Textiles/Linen_Blue.mdl",
+            # "/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Textiles/Leather_Black.mdl",
+            "Assets/Material/Fluid/Textiles/Leather_Brown.mdl",
+            #"/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Textiles/Leather_Brown.mdl",
+            # "/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Textiles/Leather_Black.mdl",
+            # "/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Natural/Water_Opaque.mdl",
+            # "/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Natural/Water.mdl",
+          ]
+
+      # pos: [0.0, 0.0, 1.2]
+      # ori: [0.0,0.0,0.0]
+      physics:
+        type: "fluid"
+        particle_system:
+          particle_contact_offset: 0.0025
+          contact_offset: 0.0025
+          rest_offset: 0.0024
+          fluid_rest_offset: 0.0015
+          solid_rest_offset: 0.0015
+          max_velocity: 0.5
+          smoothing: False
+          anisotropy: False
+          isosurface: True
+
+        particle_material:
+          adhesion: null
+          adhesion_offset_scale: null
+          cohesion: 0.01
+          particle_adhesion_scale: null
+          particle_friction_scale: null
+          drag: null
+          lift: null
+          friction: 0.1
+          damping: 0.99
+          gravity_scale: 1.0
+          viscosity: 0.0091
+          vorticity_confinement: null
+          surface_tension: 0.0074
+          density: null
+          cfl_coefficient: null
+
+        fluid_volumn: 1
+
+bowl:
+  common:
+    initial_pos_range: [ 2.7, 0.45, 0.83, 2.7, 0.45, 0.83] 
+    initial_ori_range: [0, 0, 0, 0, 0, 0]
+    soft_reset_pos_range: [ 2.66, 0.4 ,0.83, 2.74, 0.5,0.83]
+    soft_reset_ori_range: [0, 0, 0, 0, 0, 0]
+    scale: [1.0, 1.0, 1.0]

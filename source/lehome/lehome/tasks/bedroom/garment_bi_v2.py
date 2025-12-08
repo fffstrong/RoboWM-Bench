@@ -23,6 +23,7 @@ from lehome.utils.success_checker_v2 import (
     success_checker_short_pant_fold,
     success_checker_long_pant_fold,
 )
+from lehome.utils.depth_to_pointcloud import generate_pointcloud_from_data
 from lehome.assets.scenes.kitchen import KITCHEN_WITH_ORANGE_USD_PATH
 from lehome.devices.action_process import preprocess_device_action
 from lehome.assets.object.Garment import GarmentObject
@@ -186,6 +187,38 @@ class GarmentEnv(DirectRLEnv):
             "observation.top_depth": top_camera_depth.cpu().detach().numpy(),
         }
         return observations
+
+    def _get_workspace_pointcloud(
+        self, env_index: int = 0, num_points: int = 2048, use_fps: bool = False
+    ):
+        """
+        Retrive workspace pointcloud from specified env_id (Robot Right Arm Base Frame)。
+
+        Args:
+            env_index (int)
+            num_points (int)
+            use_fps (bool)
+
+        Returns:
+            points (np.ndarray)
+            colors (np.ndarray) (0-255)
+        """
+        top_camera_rgb_tensor = self.top_camera.data.output["rgb"]
+        top_camera_depth_tensor = self.top_camera.data.output["depth"]
+
+        depth_img = top_camera_depth_tensor[env_index].clone().cpu().numpy().squeeze()
+
+        # RGB Tensor shape (Num_Envs, H, W, 4) -> (H, W, 3/4)
+        rgb_img = top_camera_rgb_tensor[env_index].clone().cpu().numpy()
+
+        points, colors = generate_pointcloud_from_data(
+            rgb_image=rgb_img,
+            depth_image=depth_img,
+            num_points=num_points,
+            use_fps=use_fps,
+        )
+
+        return points, colors
 
     def _get_rewards(self) -> torch.Tensor:
         success = self._check_success()

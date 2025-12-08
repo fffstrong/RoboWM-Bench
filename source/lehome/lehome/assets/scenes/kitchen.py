@@ -13,6 +13,10 @@ KITCHEN_WITH_ORANGE_USD_PATH = str(
     SCENES_ROOT / "scenes" / "kitchen_with_orange" / "scene_v1.usd"
 )
 
+KITCHEN_WITH_ORANGE_USD_PATH_1 = str(
+    SCENES_ROOT / "scenes" / "kitchen_with_orange" / "scene_v2.usd"
+)
+
 KITCHEN_WITH_ORANGE_CFG = AssetBaseCfg(
     spawn=sim_utils.UsdFileCfg(
         usd_path=KITCHEN_WITH_ORANGE_USD_PATH,
