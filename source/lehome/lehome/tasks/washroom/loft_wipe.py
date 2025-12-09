@@ -1,29 +1,31 @@
 from __future__ import annotations
 import os
 import torch
-
-# from dataclasses import MISSING
+from dataclasses import MISSING
 from typing import Any, Dict, List, Sequence
-
-from isaaclab.assets import Articulation, RigidObject
+import isaaclab.sim as sim_utils
+import torch
+from collections.abc import Sequence
+from isaaclab.assets import Articulation
 from isaaclab.sensors import TiledCamera
-from .loft_water_cfg import LoftWaterEnvCfg
+from .loft_wipe_cfg import LoftWipeEnvCfg
 from ..base.base_env import BaseEnv
 from ..base.base_env_cfg import BaseEnvCfg
 from lehome.devices.action_process import preprocess_device_action
 from omegaconf import OmegaConf
 import numpy as np
 from lehome.assets.object.fluid import FluidObject
+from lehome.assets.object.Garment import GarmentObject
 
 
-class LoftWaterEnv(BaseEnv):
+class LoftWipeEnv(BaseEnv):
     """Environment inheriting from base LW_Loft environment with additional features."""
 
-    cfg: BaseEnvCfg | LoftWaterEnvCfg
+    cfg: BaseEnvCfg | LoftWipeEnvCfg
 
     def __init__(
         self,
-        cfg: BaseEnvCfg | LoftWaterEnvCfg,
+        cfg: BaseEnvCfg | LoftWipeEnvCfg,
         render_mode: str | None = None,
         **kwargs,
     ):
@@ -31,16 +33,24 @@ class LoftWaterEnv(BaseEnv):
         # Additional initialization specific to this environment
 
         self.action_scale = self.cfg.action_scale
-        self.joint_pos = self.arm.data.joint_pos
+        self.joint_pos = self.robot.data.joint_pos
 
     def _setup_scene(self):
         """Setup the scene by calling parent method and adding additional assets."""
         # Call parent setup to get base scene (LW_Loft + robot + camera)
         super()._setup_scene()
-        self.arm = Articulation(self.cfg.robot)
+        self.robot = Articulation(self.cfg.robot)
         self.top_camera = TiledCamera(self.cfg.top_camera)
         self.wrist_camera = TiledCamera(self.cfg.wrist_camera)
-
+        self.towel = GarmentObject(
+            prim_path="/World/Objects/Towel",
+            usd_path=os.getcwd() + "/Assets/objects/Towel/towel.usd",
+            visual_usd_path=os.getcwd() + "/Assets/Material/Garment/linen_Blue.usd",
+            config=OmegaConf.load(
+                os.getcwd()
+                + "/source/lehome/lehome/tasks/washroom/config_file/particle_towel_cfg.yaml"
+            ),
+        )
         self.object = FluidObject(
             env_id=0,
             env_origin=torch.zeros(1, 3),
@@ -48,15 +58,15 @@ class LoftWaterEnv(BaseEnv):
             usd_path=os.getcwd() + "/Assets/scenes/LW_Loft/water.usdc",
             config=OmegaConf.load(
                 os.getcwd()
-                + "/source/lehome/lehome/tasks/livingroom/config_file/fluid.yaml"
+                + "/source/lehome/lehome/tasks/washroom/config_file/fluid.yaml"
             ),
-            use_container=True,
+            use_container=False,
         )
-        self.bowl = RigidObject(self.cfg.bowl)
-        self.scene.rigid_objects["bowl"] = self.bowl
 
+        if self.device == "cpu":
+            self.scene.filter_collisions(global_prim_paths=[])
         # add articulation to scene
-        self.scene.articulations["robot"] = self.arm
+        self.scene.articulations["robot"] = self.robot
 
         self.scene.sensors["top_camera"] = self.top_camera
         self.scene.sensors["wrist_camera"] = self.wrist_camera
@@ -65,7 +75,8 @@ class LoftWaterEnv(BaseEnv):
         self.actions = self.action_scale * actions.clone()
 
     def _apply_action(self) -> None:
-        self.arm.set_joint_position_target(self.actions)
+
+        self.robot.set_joint_position_target(self.actions)
 
     def _get_observations(self) -> dict:
         action = self.actions.squeeze(0)
@@ -99,28 +110,22 @@ class LoftWaterEnv(BaseEnv):
         time_out = self.episode_length_buf >= self.max_episode_length - 1
         return time_out, time_out
 
+    def _reset_idx(self, env_ids: Sequence[int] | None):
+        if env_ids is None:
+            env_ids = self.robot._ALL_INDICES
+        super()._reset_idx(env_ids)
+
+        wrist_joint_pos = self.robot.data.default_joint_pos[env_ids]
+        self.object.reset(soft=True)
+        self.robot.write_joint_position_to_sim(
+            wrist_joint_pos, joint_ids=None, env_ids=env_ids
+        )
+        self.towel.reset()
+        self.object.reset(soft=True)
+
     def _get_successes(self) -> torch.Tensor:  # TODO: define success condition
         successes = torch.zeros_like(self.episode_length_buf, dtype=torch.bool)
         return successes
-
-    def _reset_idx(self, env_ids: Sequence[int] | None):
-        if env_ids is None:
-            env_ids = self.arm._ALL_INDICES
-        super()._reset_idx(env_ids)
-
-        joint_pos = self.arm.data.default_joint_pos[env_ids]
-        self.object.reset()
-        bowl_pos = self.bowl.data.default_root_state[env_ids].clone()
-        # 在与 bowl_pos 相同的设备上创建随机值
-        rand_vals_1 = torch.empty(len(env_ids), 2, device=bowl_pos.device).uniform_(
-            -0.05, 0.05
-        )
-        # 为 bowl 添加随机位置扰动
-        random_bowl_pos = bowl_pos.clone()
-        random_bowl_pos[..., :2] += rand_vals_1
-        random_bowl_pos[..., 7:] = 0.0  # 重置速度
-        self.bowl.write_root_state_to_sim(random_bowl_pos, env_ids=env_ids)
-        self.arm.write_joint_position_to_sim(joint_pos, joint_ids=None, env_ids=env_ids)
 
     def preprocess_device_action(
         self, action: dict[str, Any], teleop_device
@@ -129,35 +134,13 @@ class LoftWaterEnv(BaseEnv):
 
     def initialize_obs(self):
         self.object.initialize()
-        # RigidObject 使用 reset() 进行初始化
-        self.bowl.reset()
+        self.towel.initialize()
 
     def get_all_pose(self):
-        poses = {}
-        poses.update(self.object.get_all_pose())  # {'cup': ...}
-        # 从 RigidObject 获取 bowl 的位姿 (位置 + 四元数)
-        bowl_root_state = self.bowl.data.root_state_w[
-            0
-        ]  # [pos(3), quat(4), lin_vel(3), ang_vel(3)]
-        bowl_pose = (
-            torch.cat([bowl_root_state[:3], bowl_root_state[3:7]]).cpu().numpy()
-        )  # pos + quat
-        poses.update({"bowl": bowl_pose})
-        return poses
+        # TODO: return real pose
+        return {"abc": [1, 23, 4, 5, 6, 7]}
 
     def set_all_pose(self, pose, env_ids: Sequence[int] | None):
-        if env_ids is None:
-            env_ids = self.bowl._ALL_INDICES
-        self.object.set_all_pose(pose)
-        # 为 RigidObject 设置位姿
-        if "bowl" in pose:
-            bowl_pose = pose["bowl"]
-            # 构造 root_state: [pos(3), quat(4), lin_vel(3), ang_vel(3)]
-            bowl_root_state = self.bowl.data.default_root_state[env_ids].clone()
-            if isinstance(bowl_pose, np.ndarray):
-                bowl_pose = torch.from_numpy(bowl_pose).float()
-            if len(bowl_pose) >= 7:  # pos(3) + quat(4)
-                bowl_root_state[..., :3] = bowl_pose[:3]  # position
-                bowl_root_state[..., 3:7] = bowl_pose[3:7]  # quaternion
-            bowl_root_state[..., 7:] = 0.0  # 速度归零
-            self.bowl.write_root_state_to_sim(bowl_root_state, env_ids=env_ids)
+        # TODO: set real pose
+        # self.object.set_all_pose(pose)
+        pass

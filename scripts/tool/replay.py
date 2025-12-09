@@ -255,14 +255,14 @@ def main():
     # Create environment
     print(f"[Info] Creating environment: {args_cli.task}")
     env_cfg = parse_env_cfg(args_cli.task, device=args_cli.device)
-    
+
     # Set garment configuration if specified (optional for replay)
     if args_cli.garment_type is not None:
-        if hasattr(env_cfg, 'garment_type'):
+        if hasattr(env_cfg, "garment_type"):
             env_cfg.garment_type = args_cli.garment_type
-        if hasattr(env_cfg, 'garment_index'):
+        if hasattr(env_cfg, "garment_index"):
             env_cfg.garment_index = None  # Use recorded initial pose, so keep None
-    
+
     env: DirectRLEnv = gym.make(args_cli.task, cfg=env_cfg).unwrapped
 
     # Initialize observations
@@ -349,7 +349,8 @@ def main():
                 print(f"  → Saved as episode {saved_episodes - 1}")
             elif replay_dataset is not None:
                 replay_dataset.clear_episode_buffer()
-
+    replay_dataset.clear_episode_buffer()
+    replay_dataset.finalize()
     # Print statistics
     print(f"\n{'='*60}")
     print("[Statistics]")

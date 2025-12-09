@@ -235,8 +235,8 @@ def create_dataset_if_needed(args: argparse.Namespace):
         # 例子：双臂用 top + left + right
         image_keys = ["top_rgb", "left_rgb", "right_rgb"]
     else:
-        # 例子：单臂只用 top + left（如果你单臂也有 right，就把它也加进来）
-        image_keys = ["top_rgb", "left_rgb"]
+        # 例子：单臂只用 top + wrist（如果你单臂也有 right，就把它也加进来）
+        image_keys = ["top_rgb", "wrist_rgb"]
 
     for key in image_keys:
         features[f"observation.images.{key}"] = {
@@ -360,7 +360,8 @@ def run_recording_phase(
         # for _ in range(1000):
         #     env.render()
         object_initial_pose = env.get_all_pose()
-
+    dataset.clear_episode_buffer()
+    dataset.finalize()
     print(f"所有 {args.num_episode} 条 episode 录制完成！")
     return object_initial_pose
 

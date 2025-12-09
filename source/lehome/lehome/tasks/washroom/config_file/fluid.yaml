@@ -1,10 +1,10 @@
 objects:
   common:
-    initial_pos_range: [ 2.7, 0.73 ,0.91, 2.7, 0.73 ,0.91]
-    initial_ori_range: [0, 0, 60, 0, 0, 60]
-    soft_reset_pos_range: [ 2.7, 0.73 ,0.91, 2.7, 0.73 ,0.91]
-    soft_reset_ori_range: [0, 0, 60, 0, 0, 60]
-    scale: [1.5, 1.5, 1.5]
+    initial_pos_range: [ 1.25459, -2.5692, 0.03, 1.08459, -2.3592, 0.03] # [1.20459, -2.5692, 0.01, 1.25459, -2.6092, 0.01]
+    initial_ori_range: [0, 0, 0, 0,0, 0]
+    soft_reset_pos_range: [1.25459, -2.5692, 0.03, 1.08459, -2.3592, 0.03]
+    soft_reset_ori_range: [0, 0, 0, 0,0, 0]
+    scale: [1.0, 1.0, 1.0]
 
   fluid_items:
     common:
@@ -15,7 +15,7 @@ objects:
 
     fluid_items_1:
       visual:
-        scale: [1.3,1.3,1.3]
+        scale: [1.0,1.0,1.0]
         container_scale: [1.0,1.0,1.0]
         visual_material:
           material_usd_folder: [
@@ -23,8 +23,7 @@ objects:
             # "/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Textiles/Linen_White.mdl",
             # "/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Textiles/Linen_Blue.mdl",
             # "/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Textiles/Leather_Black.mdl",
-            "Assets/Material/Fluid/Textiles/Leather_Brown.mdl",
-            #"/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Textiles/Leather_Brown.mdl",
+            "/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Textiles/Leather_Brown.mdl",
             # "/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Textiles/Leather_Black.mdl",
             # "/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Natural/Water_Opaque.mdl",
             # "/home/glzn/IsaacLab/lehome/source/lehome/lehome/assets/object/fluid/material/Natural/Water.mdl",
@@ -35,12 +34,12 @@ objects:
       physics:
         type: "fluid"
         particle_system:
-          particle_contact_offset: 0.0025
-          contact_offset: 0.0025
-          rest_offset: 0.0024
-          fluid_rest_offset: 0.0015
-          solid_rest_offset: 0.0015
-          max_velocity: 0.5
+          particle_contact_offset: 0.005
+          contact_offset: 0.005
+          rest_offset: 0.00495
+          fluid_rest_offset: 0.00297
+          solid_rest_offset: 0.00297
+          max_velocity: 2.5
           smoothing: False
           anisotropy: False
           isosurface: True
@@ -63,11 +62,3 @@ objects:
           cfl_coefficient: null
 
         fluid_volumn: 1
-
-bowl:
-  common:
-    initial_pos_range: [ 2.7, 0.45, 0.83, 2.7, 0.45, 0.83] 
-    initial_ori_range: [0, 0, 0, 0, 0, 0]
-    soft_reset_pos_range: [ 2.66, 0.4 ,0.83, 2.74, 0.5,0.83]
-    soft_reset_ori_range: [0, 0, 0, 0, 0, 0]
-    scale: [1.0, 1.0, 1.0]

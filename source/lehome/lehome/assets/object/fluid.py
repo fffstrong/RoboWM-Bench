@@ -33,6 +33,7 @@ class FluidObject:
         prim_path: str,
         usd_path: str,
         config: DictConfig,
+        use_container: bool = True,
     ):
         """
         Initialize the FluidObject with configuration, USD assets, and physics setup.
@@ -80,7 +81,15 @@ class FluidObject:
         add_reference_to_stage(usd_path=usd_path, prim_path=prim_path)
 
         # --- 4. Container Setup ---
-        self.container_usd_path = os.getcwd() + "/Assets/scenes/LW_Loft/Loft/Cup012/Cup012.usd"
+        if use_container:
+            self.container_usd_path = (
+                os.getcwd() + "/Assets/scenes/LW_Loft/Loft/Cup012/Cup012.usd"
+            )
+        else:
+            self.container_usd_path = (
+                os.getcwd()
+                + "/Assets/scenes/LW_Loft/Loft/Cup0121/Cup012.usd"  # empty cup
+            )
         self.container_prim_path = find_unique_string_name(
             initial_name=os.path.dirname(prim_path) + "/container",
             is_unique_fn=lambda x: not is_prim_path_valid(x),
@@ -89,7 +98,7 @@ class FluidObject:
             usd_path=self.container_usd_path, prim_path=self.container_prim_path
         )
         self.container_position = Gf.Vec3d(
-            self.init_pos[0], self.init_pos[1], self.init_pos[2]  # - 0.03
+            self.init_pos[0], self.init_pos[1], self.init_pos[2] - 0.08
         )
         self.container_orientation = self.init_ori
         self.container = SingleXFormPrim(
@@ -357,7 +366,7 @@ class FluidObject:
         ori_quat = euler_angles_to_quat(ori_euler, degrees=True)
 
         # Update container pose
-        cup_pos = [water_pos[0], water_pos[1], water_pos[2]]  # - 0.03]
+        cup_pos = [water_pos[0], water_pos[1], water_pos[2] - 0.08]
         scale = self.instance_config.get("visual", {}).get(
             "container_scale", [1.0, 1.0, 1.0]
         )
@@ -576,5 +585,3 @@ def generate_particles_in_convex_mesh(
         )
 
     return [Gf.Vec3f(*pt) for pt in inside_points], [Gf.Vec3f(*vel) for vel in velocity]
-
-
