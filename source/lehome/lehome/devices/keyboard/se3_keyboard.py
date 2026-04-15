@@ -77,8 +77,9 @@ class Se3Keyboard(Device):
         msg += "\tJoint 6 (gripper):       Q/A\n"
         msg += "\t----------------------------------------------\n"
         msg += "\tStart Control: B\n"
-        msg += "\tTask Failed and Reset: R\n"
-        msg += "\tTask Success and Reset: N\n"
+        msg += "\tStart Recording: S\n"
+        msg += "\tDiscard Episode: D\n"
+        msg += "\tTask Success and Save: N\n"
         msg += "\tAbort Recording: ESC\n"
         msg += "\tControl+C: quit"
         return msg

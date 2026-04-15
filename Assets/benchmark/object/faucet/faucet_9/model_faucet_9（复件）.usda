@@ -1,0 +1,186 @@
+#usda 1.0
+(
+    customLayerData = {
+        dictionary cameraSettings = {
+            dictionary Front = {
+                double3 position = (5, 0, 0)
+                double radius = 5
+            }
+            dictionary Perspective = {
+                double3 position = (-0.48008731994685766, 0.6805430112994729, 0.39800023541643614)
+                double3 target = (0.056735486572163485, -0.017384806063599934, 0.16572149151747104)
+            }
+            dictionary Right = {
+                double3 position = (0, -5, 0)
+                double radius = 5
+            }
+            dictionary Top = {
+                double3 position = (0, 0, 5)
+                double radius = 5
+            }
+            string boundCamera = "/OmniverseKit_Persp"
+        }
+        dictionary omni_layer = {
+            string authoring_layer = "./model_faucet_9.usda"
+        }
+        dictionary renderSettings = {
+            double "rtx:translucency:worldEps" = 0.05
+        }
+    }
+    defaultPrim = "root"
+    metersPerUnit = 1
+    subLayers = [
+        @./resource/material.usda@,
+        @./resource/v_0/link_default_0.usda@
+    ]
+    upAxis = "Z"
+)
+
+over "root" (
+    prepend apiSchemas = ["SemanticsAPI:Semantics_MMz7"]
+    kind = "component"
+)
+{
+    string semantic:Semantics_MMz7:params:semanticData = "faucet"
+    string semantic:Semantics_MMz7:params:semanticType = "class"
+
+    over "E_body_1" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsArticulationRootAPI", "PhysxArticulationAPI"]
+    )
+    {
+        bool physics:kinematicEnabled = 0
+        bool physics:rigidBodyEnabled = 1
+        bool physxArticulation:enabledSelfCollisions = 1
+
+        def PhysicsFixedJoint "FixedJoint"
+        {
+            rel physics:body1 = </root/E_body_1>
+            float physics:breakForce = inf
+            float physics:breakTorque = inf
+            point3f physics:localPos0 = (0, 3.469447e-18, 0)
+            point3f physics:localPos1 = (0, 3.469447e-18, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (1, 0, 0, 0)
+        }
+
+        over "P_ebbc07ae9ab46eec" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </root/materials/Steel_Stainless> (
+                bindMaterialAs = "weakerThanDescendants"
+            )
+        }
+    }
+
+    over "E_pipe_2" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsArticulationRootAPI", "PhysxArticulationAPI", "SemanticsAPI:Semantics_iEuU"]
+    )
+    {
+        bool physics:kinematicEnabled = 0
+        bool physics:rigidBodyEnabled = 1
+        string semantic:Semantics_iEuU:params:semanticData = "pipe"
+        string semantic:Semantics_iEuU:params:semanticType = "class"
+
+        def PhysicsRevoluteJoint "RevoluteJoint_Faucet_9_down" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        )
+        {
+            float drive:angular:physics:damping = 10
+            float drive:angular:physics:stiffness = 10
+            float drive:angular:physics:targetPosition = 90
+            uniform token drive:angular:physics:type = "acceleration"
+            uniform token physics:axis = "Z"
+            rel physics:body0 = </root/E_body_1>
+            rel physics:body1 = </root/E_pipe_2>
+            float physics:breakForce = inf
+            float physics:breakTorque = inf
+            point3f physics:localPos0 = (0, 0, 0)
+            point3f physics:localPos1 = (0, 0, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (1, 0, 0, 0)
+            float physics:lowerLimit = 0
+            float physics:upperLimit = 90
+        }
+
+        over "P_58ba0cb75cc26eec" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </root/materials/Steel_Stainless> (
+                bindMaterialAs = "weakerThanDescendants"
+            )
+        }
+    }
+
+    over "E_switch_3" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "SemanticsAPI:Semantics_yv4W"]
+    )
+    {
+        bool physics:kinematicEnabled = 0
+        bool physics:rigidBodyEnabled = 1
+        string semantic:Semantics_yv4W:params:semanticData = "handle"
+        string semantic:Semantics_yv4W:params:semanticType = "class"
+
+        def PhysicsRevoluteJoint "RevoluteJoint_Faucet_9_up" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        )
+        {
+            float drive:angular:physics:damping = 10
+            float drive:angular:physics:stiffness = 10
+            float drive:angular:physics:targetPosition = -90
+            uniform token drive:angular:physics:type = "acceleration"
+            uniform token physics:axis = "Z"
+            rel physics:body0 = </root/E_pipe_2>
+            rel physics:body1 = </root/E_switch_3>
+            float physics:breakForce = inf
+            float physics:breakTorque = inf
+            point3f physics:localPos0 = (0, -0.0000028, 0.3025465)
+            point3f physics:localPos1 = (0, 0, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (1, 0, 0, 0)
+            float physics:lowerLimit = -90
+            float physics:upperLimit = 0
+        }
+
+        over "P_ff3068bd6cf26eec" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </root/materials/Steel_Stainless> (
+                bindMaterialAs = "weakerThanDescendants"
+            )
+        }
+    }
+
+    over "materials"
+    {
+        over "mat_1284143"
+        {
+            over "PBRShader"
+            {
+                float inputs:clearcoat = 0.35
+                float inputs:metallic = 0.72999996
+                float inputs:roughness = 0.17999999
+            }
+        }
+
+        def Material "Steel_Stainless"
+        {
+            token outputs:mdl:displacement.connect = </root/materials/Steel_Stainless/Shader.outputs:out>
+            token outputs:mdl:surface.connect = </root/materials/Steel_Stainless/Shader.outputs:out>
+            token outputs:mdl:volume.connect = </root/materials/Steel_Stainless/Shader.outputs:out>
+
+            def Shader "Shader"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                uniform asset info:mdl:sourceAsset = @./NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless.mdl@
+                uniform token info:mdl:sourceAsset:subIdentifier = "Steel_Stainless"
+                token outputs:out (
+                    renderType = "material"
+                )
+            }
+        }
+    }
+}
+

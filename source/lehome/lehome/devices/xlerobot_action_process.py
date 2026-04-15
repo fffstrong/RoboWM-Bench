@@ -3,47 +3,47 @@ from typing import Any
 
 import isaaclab.envs.mdp as mdp
 
-# Xlerobot关节限制
+# Xlerobot joint limit
 XLEROBOT_JOINT_LIMITS = {
-    # 移动底盘关节
-    "root_x_axis_joint": (-20.0, 20.0),      # X轴平移
-    # "root_y_axis_joint": (-20.0, 20.0),      # Y轴平移  
-    "root_z_rotation_joint": (-3.14159, 3.14159),  # Z轴旋转
+    # mobile base joint
+    "root_x_axis_joint": (-20.0, 20.0),      # X-axis translation 
+    # "root_y_axis_joint": (-20.0, 20.0),      # Y-axis translation  
+    "root_z_rotation_joint": (-3.14159, 3.14159),  # Z-axis rotation
     
-    # 左臂关节
-    "Rotation": (-2.1, 2.1),                 # 肩部旋转
-    "Pitch": (-0.1, 3.45),                   # 肩部抬升
-    "Elbow": (-0.2, 3.14159),                # 肘部弯曲
-    "Wrist_Pitch": (-1.8, 1.8),              # 腕部弯曲
-    "Wrist_Roll": (-3.14159, 3.14159),       # 腕部旋转
-    "Jaw": (-0.5, 0.5),                      # 左臂夹爪
+    # left arm joint
+    "Rotation": (-2.1, 2.1),                 # shoulder rotation
+    "Pitch": (-0.1, 3.45),                   # shoulder lift
+    "Elbow": (-0.2, 3.14159),                # elbow flex
+    "Wrist_Pitch": (-1.8, 1.8),              # wrist pitch
+    "Wrist_Roll": (-3.14159, 3.14159),       # wrist roll
+    "Jaw": (-0.5, 0.5),                      # left arm gripper
     
-    # 右臂关节
-    "Rotation_2": (-2.1, 2.1),               # 右肩部旋转
-    "Pitch_2": (-0.1, 3.45),                 # 右肩部抬升
-    "Elbow_2": (-0.2, 3.14159),              # 右肘部弯曲
-    "Wrist_Pitch_2": (-1.8, 1.8),            # 右腕部弯曲
-    "Wrist_Roll_2": (-3.14159, 3.14159),     # 右腕部旋转
-    "Jaw_2": (-0.5, 0.5),                    # 右臂夹爪
+    # right arm joint
+    "Rotation_2": (-2.1, 2.1),               # right shoulder rotation
+    "Pitch_2": (-0.1, 3.45),                 # right shoulder lift
+    "Elbow_2": (-0.2, 3.14159),              # right elbow flex
+    "Wrist_Pitch_2": (-1.8, 1.8),            # right wrist pitch
+    "Wrist_Roll_2": (-3.14159, 3.14159),     # right wrist roll
+    "Jaw_2": (-0.5, 0.5),                    # right arm gripper
     
-    # 头部关节
-    "head_pan_joint": (-1.57, 1.57),         # 头部水平旋转
-    "head_tilt_joint": (-0.76, 1.45),        # 头部垂直倾斜
+    # head joint
+    "head_pan_joint": (-1.57, 1.57),         # head horizontal rotation
+    "head_tilt_joint": (-0.76, 1.45),        # head vertical tilt
 }
 
 
 def init_xlerobot_action_cfg(action_cfg, device):
-    """初始化xlerobot的动作配置"""
+    """Initialize xlerobot action configuration"""
     if device in ['keyboard']:
-        # 键盘控制 - 移除底盘动作配置，使用直接位置控制
-        # 注释掉或删除base_action配置
+        # keyboard control - remove base action configuration, use direct position control
+        # comment out or delete base_action configuration
         # action_cfg.base_action = mdp.RelativeJointPositionActionCfg(
         #     asset_name="robot",
         #     joint_names=["root_x_axis_joint", "root_z_rotation_joint"],
         #     scale=2.0,
         # )
         
-        # 只保留手臂和头部的动作配置
+        # only keep arm and head action configuration
         action_cfg.left_arm_action = mdp.RelativeJointPositionActionCfg(
             asset_name="robot",
             joint_names=["Rotation", "Pitch", "Elbow", "Wrist_Pitch", "Wrist_Roll"],
@@ -70,11 +70,11 @@ def init_xlerobot_action_cfg(action_cfg, device):
             scale=2.0,
         )
         
-        # 清空base_action，避免冲突
+        # clear base_action, avoid conflict
         action_cfg.base_action = None
         
     elif device in ['xlerobot_leader']:
-        # 物理设备控制 - 使用绝对位置控制
+        # physical device control - use absolute position control
         action_cfg.base_action = mdp.JointPositionActionCfg(
             asset_name="robot",
             joint_names=["root_x_axis_joint", "root_z_rotation_joint"],
@@ -106,7 +106,7 @@ def init_xlerobot_action_cfg(action_cfg, device):
             scale=1.0,
         )
     elif device in ['xbox', 'gamepad']:
-        # Xbox 控制 - 使用统一的动作空间
+        # Xbox control - use unified action space
         action_cfg.unified_action = mdp.JointPositionActionCfg(
             asset_name="robot",
             joint_names=[
@@ -117,7 +117,7 @@ def init_xlerobot_action_cfg(action_cfg, device):
             ],
             scale=1.0,
         )
-        # 清空其他动作配置
+        # clear other action configuration
         action_cfg.base_action = None
         action_cfg.left_arm_action = None
         action_cfg.left_gripper_action = None
@@ -125,7 +125,7 @@ def init_xlerobot_action_cfg(action_cfg, device):
         action_cfg.right_gripper_action = None
         action_cfg.head_action = None
     else:
-        # 默认配置
+        # default configuration
         action_cfg.base_action = None
         action_cfg.left_arm_action = None
         action_cfg.left_gripper_action = None
@@ -136,35 +136,35 @@ def init_xlerobot_action_cfg(action_cfg, device):
     return action_cfg
 
 
-# 更新关节映射索引
+# update joint mapping index
 xlerobot_joint_names_to_motor_ids = {
-    # 旋转关节 (0)
+    # rotation joint (0)
     "root_z_rotation_joint": 0,
     
-    # 左臂 (1-5)
+    # left arm (1-5)
     "Rotation": 1,
     "Pitch": 2,
     "Elbow": 3,
     "Wrist_Pitch": 4,
     "Wrist_Roll": 5,
-    "Jaw": 6,  # 左夹爪
+    "Jaw": 6,  # left gripper
     
-    # 右臂 (7-11)
+    # right arm (7-11)
     "Rotation_2": 7,
     "Pitch_2": 8,
     "Elbow_2": 9,
     "Wrist_Pitch_2": 10,
     "Wrist_Roll_2": 11,
-    "Jaw_2": 12,  # 右夹爪
+    "Jaw_2": 12,  # right gripper
     
-    # 头部 (13-14)
+    # head (13-14)
     "head_pan_joint": 13,
     "head_tilt_joint": 14,
 }
 
 
 def convert_action_from_xlerobot_leader(joint_state: dict[str, float], motor_limits: dict[str, tuple[float, float]], teleop_device) -> torch.Tensor:
-    """从xlerobot leader设备转换动作"""
+    """convert action from xlerobot leader device"""
     processed_action = torch.zeros(teleop_device.env.num_envs, 15, device=teleop_device.env.device)
     
     for joint_name, motor_id in xlerobot_joint_names_to_motor_ids.items():
@@ -172,16 +172,16 @@ def convert_action_from_xlerobot_leader(joint_state: dict[str, float], motor_lim
             motor_limit_range = motor_limits[joint_name]
             joint_limit_range = XLEROBOT_JOINT_LIMITS[joint_name]
             
-            # 将设备范围映射到关节范围
+            # map device range to joint range
             processed_degree = (joint_state[joint_name] - motor_limit_range[0]) / (motor_limit_range[1] - motor_limit_range[0]) \
                 * (joint_limit_range[1] - joint_limit_range[0]) + joint_limit_range[0]
             
-            # 转换为弧度（如果需要）
+            # convert to radians (if needed)
             if joint_name in ["root_x_axis_joint", "root_y_axis_joint"]:
-                # 平移关节保持米制单位
+                # translation joint keep meter unit
                 processed_action[:, motor_id] = processed_degree
             else:
-                # 旋转关节转换为弧度
+                # rotation joint convert to radians
                 processed_radius = processed_degree / 180.0 * torch.pi
                 processed_action[:, motor_id] = processed_radius
     
@@ -189,23 +189,23 @@ def convert_action_from_xlerobot_leader(joint_state: dict[str, float], motor_lim
 
 
 def preprocess_xlerobot_device_action(action: dict[str, Any], teleop_device) -> torch.Tensor:
-    """预处理xlerobot设备动作"""
+    """preprocess xlerobot device action"""
     if action.get('hybrid_controller') is not None:
-        # 混合控制器动作处理
+        # hybrid controller action processing
         processed_action = torch.zeros(teleop_device.env.num_envs, 15, device=teleop_device.env.device)
         processed_action[:, :] = action['joint_state']
     elif action.get('xlerobot_leader') is not None:
         processed_action = convert_action_from_xlerobot_leader(action['joint_state'], action['motor_limits'], teleop_device)
     elif action.get('keyboard') is not None:
-        # 键盘动作直接使用
+        # keyboard action directly use
         processed_action = torch.zeros(teleop_device.env.num_envs, 15, device=teleop_device.env.device)
         processed_action[:, :] = action['joint_state']
     elif action.get('xbox') is not None:
-        # Xbox 控制器动作处理 
+        # Xbox controller action processing 
         processed_action = torch.zeros(teleop_device.env.num_envs, 15, device=teleop_device.env.device)
         processed_action[:, :] = action['joint_state']
     elif action.get('bi_xlerobot_leader') is not None:
-        # 双臂xlerobot leader设备 
+        # dual arm xlerobot leader device 
         processed_action = torch.zeros(teleop_device.env.num_envs, 15, device=teleop_device.env.device)
         processed_action[:, :] = convert_action_from_xlerobot_leader(action['joint_state'], action['motor_limits'], teleop_device)
     else:
@@ -215,15 +215,15 @@ def preprocess_xlerobot_device_action(action: dict[str, Any], teleop_device) -> 
 
 
 def get_xlerobot_action_space_size():
-    """获取xlerobot动作空间大小"""
-    return 15  # 1(旋转) + 5(左臂) + 1(左夹爪) + 5(右臂) + 1(右夹爪) + 2(头部)
+    """get xlerobot action space size"""
+    return 15  # 1(rotation) + 5(left arm) + 1(left gripper) + 5(right arm) + 1(right gripper) + 2(head)
 
 
 def get_xlerobot_joint_names():
-    """获取xlerobot所有关节名称"""
+    """get xlerobot all joint names"""
     return list(xlerobot_joint_names_to_motor_ids.keys())
 
 
 def get_xlerobot_joint_limits():
-    """获取xlerobot关节限制"""
+    """get xlerobot joint limits"""
     return XLEROBOT_JOINT_LIMITS.copy()

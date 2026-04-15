@@ -1,0 +1,76 @@
+#usda 1.0
+
+def "root"
+{
+    def Scope "materials"
+    {
+        def Material "mat_0"
+        {
+            custom float opacity = 1
+            token outputs:surface.connect = </root/materials/mat_0/PBRShader.outputs:surface>
+
+            def Shader "PBRShader"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                float inputs:clearcoat = 0.05
+                float inputs:clearcoatRoughness = 0.05
+                color3f inputs:diffuseColor = (0.972549, 0.9843137, 1)
+                color3f inputs:emissiveColor = (0, 0, 0)
+                float inputs:ior = 1
+                float inputs:opacity = 1
+                float inputs:roughness = 0.5
+                color3f inputs:specularColor = (0, 0, 0)
+                token outputs:surface
+            }
+        }
+
+        def Material "mat_1130292"
+        {
+            string inputs:frame:stPrimvarName = "st"
+            custom float opacity = 1
+            token outputs:surface.connect = </root/materials/mat_1130292/PBRShader.outputs:surface>
+
+            def Shader "PBRShader"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                float inputs:clearcoat = 0.05
+                float inputs:clearcoatRoughness = 0.05
+                color3f inputs:diffuseColor.connect = </root/materials/mat_1130292/diffuseTexture.outputs:rgb>
+                color3f inputs:emissiveColor = (0, 0, 0)
+                float inputs:ior = 1
+                float inputs:opacity = 1
+                float inputs:roughness = 0.5
+                color3f inputs:specularColor = (0, 0, 0)
+                token outputs:surface
+            }
+
+            def Shader "stReader"
+            {
+                uniform token info:id = "UsdPrimvarReader_float2"
+                string inputs:varname.connect = </root/materials/mat_1130292.inputs:frame:stPrimvarName>
+                float2 outputs:result
+            }
+
+            def Shader "transform_st"
+            {
+                uniform token info:id = "UsdTransform2d"
+                float2 inputs:in.connect = </root/materials/mat_1130292/stReader.outputs:result>
+                float inputs:rotation = 0
+                float2 inputs:scale = (39.37008, 39.37008)
+                float2 inputs:translation = (0, 0)
+                float2 outputs:result
+            }
+
+            def Shader "diffuseTexture"
+            {
+                uniform token info:id = "UsdUVTexture"
+                asset inputs:file = @./img/453a483ee435ad2e83aab120e22c2b18.png@
+                float2 inputs:st.connect = </root/materials/mat_1130292/transform_st.outputs:result>
+                token inputs:wrapS = "repeat"
+                token inputs:wrapT = "repeat"
+                float3 outputs:rgb
+            }
+        }
+    }
+}
+

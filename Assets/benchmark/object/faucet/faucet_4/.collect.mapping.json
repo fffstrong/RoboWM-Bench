@@ -1,0 +1,35 @@
+{
+    "version": "1.0",
+    "file_records": [
+        {
+            "source_url": "C:/NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless.mdl",
+            "source_hash": "4f8acaea8d2d74c5a815cb21fa0902c03d7a42f7",
+            "target_url": "./NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless.mdl",
+            "target_hash": "e1de9191f51014926537e3ba8c1d1ed70bfb881c"
+        },
+        {
+            "source_url": "C:/lulu/model(\u6700\u7ec8\u7248)/03faucet/faucet_4/resource/img/ac18e6a00935a513fdc1b412ba9d3cf1.png",
+            "source_hash": "31a5c44bcbaf5ec5e67d249b5f61d4a5cd28e777",
+            "target_url": "./resource/img/ac18e6a00935a513fdc1b412ba9d3cf1.png",
+            "target_hash": "31a5c44bcbaf5ec5e67d249b5f61d4a5cd28e777"
+        },
+        {
+            "source_url": "C:/NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless/Steel_Stainless_BaseColor.png",
+            "source_hash": "a58f69c52f866095d73d69a31ae9462b354683bd",
+            "target_url": "./NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless/Steel_Stainless_BaseColor.png",
+            "target_hash": "a58f69c52f866095d73d69a31ae9462b354683bd"
+        },
+        {
+            "source_url": "C:/NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless/Steel_Stainless_ORM.png",
+            "source_hash": "9f664db2422fded8d400cd45a89aa3f3d66a4f80",
+            "target_url": "./NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless/Steel_Stainless_ORM.png",
+            "target_hash": "9f664db2422fded8d400cd45a89aa3f3d66a4f80"
+        },
+        {
+            "source_url": "C:/NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless/Steel_Stainless_N.png",
+            "source_hash": "6bf86d7d86a3d8aba1dcaa08fe28ba00e99d3c74",
+            "target_url": "./NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless/Steel_Stainless_N.png",
+            "target_hash": "6bf86d7d86a3d8aba1dcaa08fe28ba00e99d3c74"
+        }
+    ]
+}

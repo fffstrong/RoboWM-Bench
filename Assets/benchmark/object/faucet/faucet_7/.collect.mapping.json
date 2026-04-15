@@ -1,0 +1,35 @@
+{
+    "version": "1.0",
+    "file_records": [
+        {
+            "source_url": "C:/Users/Extwin/Desktop/\u7f51\u76d8\u4e0b\u8f7d(\u6bcf\u7c7b1\u4e2a)/faucet/faucet_7/NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Carbon.mdl",
+            "source_hash": "3979409394e055b0432ac703a522406bc9a0e2d0",
+            "target_url": "./NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Carbon.mdl",
+            "target_hash": "10bb857dcb8817dca1e1afad04b148af18c93911"
+        },
+        {
+            "source_url": "C:/Users/Extwin/Desktop/\u7f51\u76d8\u4e0b\u8f7d(\u6bcf\u7c7b1\u4e2a)/faucet/faucet_7/resource/img/453a483ee435ad2e83aab120e22c2b18.png",
+            "source_hash": "8c6cd1b8183c2e1046e48861935b722a00cfd17a",
+            "target_url": "./resource/img/453a483ee435ad2e83aab120e22c2b18.png",
+            "target_hash": "8c6cd1b8183c2e1046e48861935b722a00cfd17a"
+        },
+        {
+            "source_url": "C:/Users/Extwin/Desktop/\u7f51\u76d8\u4e0b\u8f7d(\u6bcf\u7c7b1\u4e2a)/faucet/faucet_7/NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Carbon/Steel_Carbon_BaseColor.png",
+            "source_hash": "848256cdefba14c7cfc258b8ccf281092a00dc95",
+            "target_url": "./NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Carbon/Steel_Carbon_BaseColor.png",
+            "target_hash": "848256cdefba14c7cfc258b8ccf281092a00dc95"
+        },
+        {
+            "source_url": "C:/Users/Extwin/Desktop/\u7f51\u76d8\u4e0b\u8f7d(\u6bcf\u7c7b1\u4e2a)/faucet/faucet_7/NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Carbon/Steel_Carbon_ORM.png",
+            "source_hash": "8e2d7011747966039641e69e6cd1c8d01f8329b1",
+            "target_url": "./NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Carbon/Steel_Carbon_ORM.png",
+            "target_hash": "8e2d7011747966039641e69e6cd1c8d01f8329b1"
+        },
+        {
+            "source_url": "C:/Users/Extwin/Desktop/\u7f51\u76d8\u4e0b\u8f7d(\u6bcf\u7c7b1\u4e2a)/faucet/faucet_7/NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Carbon/Steel_Carbon_N.png",
+            "source_hash": "b3605ea7d31a2fe7ff4bf13b826a08c7b9dfde22",
+            "target_url": "./NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Carbon/Steel_Carbon_N.png",
+            "target_hash": "b3605ea7d31a2fe7ff4bf13b826a08c7b9dfde22"
+        }
+    ]
+}

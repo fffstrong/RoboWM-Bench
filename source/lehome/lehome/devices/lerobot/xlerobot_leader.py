@@ -104,7 +104,7 @@ class XlerobotLeader(Device):
                     self._started = True
                     self._reset_state = False
                     self.other_key_enable = True
-                    print("XlerobotLeader控制已启动！")
+                    print("XlerobotLeader Control is activated!")
         except AttributeError:
             pass
         except Exception as e:

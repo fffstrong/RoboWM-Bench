@@ -14,8 +14,8 @@ class Collision_Checker:
     def __init__(
         self,
         stage=None,
-        prim_path0="/World/Scene/Sausage001/Trigger/Cube",
-        prim_path1="/World/Robot/Right_Robot/gripper/Knife/Knife/Knife002",
+        prim_path0="/World/Scene/Sausage001/Sausage001/Sausage001",
+        prim_path1="/World/Robot/Robot/panda_rightfinger/Knife/Knife/Knife002",
         apply_world_transform=True,
         debug=False,
     ):
@@ -28,7 +28,9 @@ class Collision_Checker:
         self.stage = stage
         self.apply_world_transform = apply_world_transform
         self.prim_path0 = prim_path0
+        print("prim_path0:", prim_path0)
         self.prim_path1 = prim_path1
+        print("prim_path1:", prim_path1)
         self.debug = debug
 
     def get_current_timecode(self):

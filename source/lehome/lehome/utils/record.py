@@ -33,10 +33,10 @@ class RateLimiter:
 
 
 def get_next_experiment_path_with_gap(base_path: Path) -> Path:
-    """查找第一个可用的编号（包括空缺位置）"""
+    """Find the first available number (including open positions)"""
     base_path.mkdir(parents=True, exist_ok=True)
 
-    # 收集现有索引
+    # collect existing indices
     indices = set()
     for folder in base_path.iterdir():
         if folder.is_dir():
@@ -45,7 +45,7 @@ def get_next_experiment_path_with_gap(base_path: Path) -> Path:
             except ValueError:
                 continue
 
-    # 找到第一个可用索引
+    # find the first available index
     folder_index = 1
     while folder_index in indices:
         folder_index += 1

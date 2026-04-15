@@ -1,0 +1,29 @@
+{
+    "version": "1.0",
+    "file_records": [
+        {
+            "source_url": "C:/Users/Extwin/Desktop/\u7f51\u76d8\u4e0b\u8f7d(\u6bcf\u7c7b1\u4e2a)/faucet/faucet_9/NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless.mdl",
+            "source_hash": "edd087242ea02f89fe4089a88a52aec639585f44",
+            "target_url": "./NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless.mdl",
+            "target_hash": "12fc92c354a76311f64887d2971e69553623b665"
+        },
+        {
+            "source_url": "C:/Users/Extwin/Desktop/\u7f51\u76d8\u4e0b\u8f7d(\u6bcf\u7c7b1\u4e2a)/faucet/faucet_9/NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless/Steel_Stainless_BaseColor.png",
+            "source_hash": "5213efea8d67c38646fbb8c206b55552eeefdee7",
+            "target_url": "./NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless/Steel_Stainless_BaseColor.png",
+            "target_hash": "5213efea8d67c38646fbb8c206b55552eeefdee7"
+        },
+        {
+            "source_url": "C:/Users/Extwin/Desktop/\u7f51\u76d8\u4e0b\u8f7d(\u6bcf\u7c7b1\u4e2a)/faucet/faucet_9/NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless/Steel_Stainless_ORM.png",
+            "source_hash": "b16f996a269913361614d3d2b1ab2eb8c4d91624",
+            "target_url": "./NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless/Steel_Stainless_ORM.png",
+            "target_hash": "b16f996a269913361614d3d2b1ab2eb8c4d91624"
+        },
+        {
+            "source_url": "C:/Users/Extwin/Desktop/\u7f51\u76d8\u4e0b\u8f7d(\u6bcf\u7c7b1\u4e2a)/faucet/faucet_9/NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless/Steel_Stainless_N.png",
+            "source_hash": "97a920b71b73d2a227e27cbbb471db532c3bfa24",
+            "target_url": "./NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Stainless/Steel_Stainless_N.png",
+            "target_hash": "97a920b71b73d2a227e27cbbb471db532c3bfa24"
+        }
+    ]
+}

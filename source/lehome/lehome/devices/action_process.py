@@ -41,6 +41,26 @@ def init_action_cfg(action_cfg, device):
             joint_names=["gripper"],
             scale=0.7,
         )
+    elif device in ["keyboard_franka"]:
+        action_cfg.arm_action = mdp.RelativeJointPositionActionCfg(
+            asset_name="robot",
+            joint_names=[
+                'panda_joint1', 
+                'panda_joint2', 
+                'panda_joint3', 
+                'panda_joint4', 
+                'panda_joint5', 
+                'panda_joint6', 
+                'panda_joint7', 
+            ],
+            scale=1.0,
+        )
+        action_cfg.gripper_action = mdp.RelativeJointPositionActionCfg(
+            asset_name="robot",
+            joint_names=['panda_finger_joint1', 
+                'panda_finger_joint2',],
+            scale=0.7,
+        )
     elif device in ["bi-so101leader"]:
         action_cfg.left_arm_action = mdp.JointPositionActionCfg(
             asset_name="left_arm",
@@ -152,9 +172,9 @@ def preprocess_device_action(action: dict[str, Any], teleop_device) -> torch.Ten
             action["joint_state"], action["motor_limits"], teleop_device
         )
     elif action.get("keyboard") is not None:
-        current_joint_pos = teleop_device.env.robot.data.joint_pos[:, :6]  # 前6个关节
+        current_joint_pos = teleop_device.env.robot.data.joint_pos[:, :6]  # First 6 joints
 
-        # 获取相对增量
+        # get relative delta
         relative_delta = action["joint_state"]
         if isinstance(relative_delta, np.ndarray):
             relative_delta = torch.tensor(
@@ -165,11 +185,53 @@ def preprocess_device_action(action: dict[str, Any], teleop_device) -> torch.Ten
                 relative_delta, device=teleop_device.env.device, dtype=torch.float32
             )
 
-        # 确保维度匹配
+        # ensure dimension matches
         if relative_delta.dim() == 1:
             relative_delta = relative_delta.unsqueeze(0).expand_as(current_joint_pos)
 
-        # 将相对增量加到当前关节位置，得到绝对位置
+        # add relative delta to current joint position, get absolute position
+        processed_action = current_joint_pos + relative_delta
+    
+    elif action.get("keyboard_droid") is not None:
+        current_joint_pos = teleop_device.env.robot.data.joint_pos[:, :13]  # First 13 joints
+
+        # get relative delta
+        relative_delta = action["joint_state"]
+        if isinstance(relative_delta, np.ndarray):
+            relative_delta = torch.tensor(
+                relative_delta, device=teleop_device.env.device, dtype=torch.float32
+            )
+        elif not isinstance(relative_delta, torch.Tensor):
+            relative_delta = torch.tensor(
+                relative_delta, device=teleop_device.env.device, dtype=torch.float32
+            )
+
+        # ensure dimension matches
+        if relative_delta.dim() == 1:
+            relative_delta = relative_delta.unsqueeze(0).expand_as(current_joint_pos)
+
+        # add relative delta to current joint position, get absolute position
+        processed_action = current_joint_pos + relative_delta
+
+    elif action.get("keyboard_franka") is not None:
+        current_joint_pos = teleop_device.env.robot.data.joint_pos[:, :9]  # First 9 joints
+
+        # get relative delta
+        relative_delta = action["joint_state"]
+        if isinstance(relative_delta, np.ndarray):
+            relative_delta = torch.tensor(
+                relative_delta, device=teleop_device.env.device, dtype=torch.float32
+            )
+        elif not isinstance(relative_delta, torch.Tensor):
+            relative_delta = torch.tensor(
+                relative_delta, device=teleop_device.env.device, dtype=torch.float32
+            )
+
+        # ensure dimension matches
+        if relative_delta.dim() == 1:
+            relative_delta = relative_delta.unsqueeze(0).expand_as(current_joint_pos)
+
+        # add relative delta to current joint position, get absolute position
         processed_action = current_joint_pos + relative_delta
 
     elif action.get("bi_so101_leader") is not None:
@@ -187,20 +249,20 @@ def preprocess_device_action(action: dict[str, Any], teleop_device) -> torch.Ten
             teleop_device,
         )
     elif action.get("bi_keyboard") is not None:
-        # 双臂键盘控制：将相对增量转换为绝对位置
-        # 获取当前关节位置（弧度）
+        # dual arm keyboard control: convert relative delta to absolute position
+        # get current joint position (radians)
         left_current_joint_pos = teleop_device.env.left_arm.data.joint_pos[
             :, :6
-        ]  # 左臂前6个关节
+        ]  # left arm first 6 joints
         right_current_joint_pos = teleop_device.env.right_arm.data.joint_pos[
             :, :6
-        ]  # 右臂前6个关节
+        ]  # right arm first 6 joints
 
-        # 获取相对增量
+        # get relative delta
         left_relative_delta = action["joint_state"]["left_arm"]
         right_relative_delta = action["joint_state"]["right_arm"]
 
-        # 转换为torch tensor
+        # convert to torch tensor
         if isinstance(left_relative_delta, np.ndarray):
             left_relative_delta = torch.tensor(
                 left_relative_delta,
@@ -227,7 +289,7 @@ def preprocess_device_action(action: dict[str, Any], teleop_device) -> torch.Ten
                 dtype=torch.float32,
             )
 
-        # 确保维度匹配
+        # ensure dimension matches
         if left_relative_delta.dim() == 1:
             left_relative_delta = left_relative_delta.unsqueeze(0).expand_as(
                 left_current_joint_pos
@@ -237,7 +299,7 @@ def preprocess_device_action(action: dict[str, Any], teleop_device) -> torch.Ten
                 right_current_joint_pos
             )
 
-        # 将相对增量加到当前关节位置，得到绝对位置
+        # add relative delta to current joint position, get absolute position
         processed_action = torch.zeros(
             teleop_device.env.num_envs, 12, device=teleop_device.env.device
         )

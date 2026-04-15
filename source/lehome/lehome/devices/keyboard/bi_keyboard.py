@@ -14,7 +14,7 @@ class BiKeyboard(Device):
     """A keyboard controller for sending SE(3) commands for bi-arm lerobot.
 
     Key bindings:
-        Left Arm (字母键):
+        Left Arm (letter keys):
         ============================== ================= =================
         Description                    Key (+ve axis)    Key (-ve axis)
         ============================== ================= =================
@@ -25,7 +25,7 @@ class BiKeyboard(Device):
         Joint 5 (wrist_roll)           O                 L
         Joint 6 (gripper)              Q                 A
 
-        Right Arm (数字键):
+        Right Arm (number keys):
         ============================== ================= =================
         Description                    Key (+ve axis)    Key (-ve axis)
         ============================== ================= =================
@@ -81,7 +81,7 @@ class BiKeyboard(Device):
         msg = "Bi-Keyboard Controller for SE(3).\n"
         msg += f"\tKeyboard name: {self._input.get_keyboard_name(self._keyboard)}\n"
         msg += "\t----------------------------------------------\n"
-        msg += "\tLeft Arm (字母键):\n"
+        msg += "\tLeft Arm (letter keys):\n"
         msg += "\t  Joint 1 (shoulder_pan):  T/G\n"
         msg += "\t  Joint 2 (shoulder_lift): Y/H\n"
         msg += "\t  Joint 3 (elbow_flex):    U/J\n"
@@ -89,7 +89,7 @@ class BiKeyboard(Device):
         msg += "\t  Joint 5 (wrist_roll):    O/L\n"
         msg += "\t  Joint 6 (gripper):       Q/A\n"
         msg += "\t----------------------------------------------\n"
-        msg += "\tRight Arm (数字键):\n"
+        msg += "\tRight Arm (number keys):\n"
         msg += "\t  Joint 1 (shoulder_pan):  1/7\n"
         msg += "\t  Joint 2 (shoulder_lift): 2/8\n"
         msg += "\t  Joint 3 (elbow_flex):    3/9\n"
@@ -162,7 +162,7 @@ class BiKeyboard(Device):
         self._additional_callbacks[key] = func
 
     def _on_keyboard_event(self, event, *args, **kwargs):
-        # 安全获取按键名称
+        # Safely get the key name
         try:
             if isinstance(event.input, str):
                 key_name = event.input
@@ -171,13 +171,13 @@ class BiKeyboard(Device):
         except AttributeError:
             return True
 
-        # apply the command when pressed
+        # Apply the command when pressed
         if event.type == carb.input.KeyboardEventType.KEY_PRESS:
             if key_name in self._LEFT_KEY_MAPPING.keys():
                 self._left_delta_pos += self._LEFT_KEY_MAPPING[key_name]
             elif key_name in self._RIGHT_KEY_MAPPING.keys():
                 self._right_delta_pos += self._RIGHT_KEY_MAPPING[key_name]
-        # remove the command when un-pressed
+        # Remove the command when un-pressed
         elif event.type == carb.input.KeyboardEventType.KEY_RELEASE:
             if key_name in self._LEFT_KEY_MAPPING.keys():
                 self._left_delta_pos -= self._LEFT_KEY_MAPPING[key_name]
@@ -187,7 +187,7 @@ class BiKeyboard(Device):
 
     def _create_key_bindings(self):
         """Creates key bindings for left and right arms."""
-        # Left arm (字母键)
+        # Left arm (letter keys)
         self._LEFT_KEY_MAPPING = {
             "T": np.asarray([1.0, 0.0, 0.0, 0.0, 0.0, 0.0]) * self.sensitivity,
             "Y": np.asarray([0.0, 1.0, 0.0, 0.0, 0.0, 0.0]) * self.sensitivity,
@@ -203,7 +203,7 @@ class BiKeyboard(Device):
             "A": np.asarray([0.0, 0.0, 0.0, 0.0, 0.0, -1.0]) * self.sensitivity,
         }
 
-        # Right arm (数字键) - 主键盘数字键使用 KEY_X 格式
+        # Right arm (number keys) - Main keyboard number keys use KEY_X format
         self._RIGHT_KEY_MAPPING = {
             "KEY_1": np.asarray([1.0, 0.0, 0.0, 0.0, 0.0, 0.0]) * self.sensitivity,
             "KEY_2": np.asarray([0.0, 1.0, 0.0, 0.0, 0.0, 0.0]) * self.sensitivity,
@@ -215,7 +215,7 @@ class BiKeyboard(Device):
             "KEY_8": np.asarray([0.0, -1.0, 0.0, 0.0, 0.0, 0.0]) * self.sensitivity,
             "KEY_9": np.asarray([0.0, 0.0, -1.0, 0.0, 0.0, 0.0]) * self.sensitivity,
             "KEY_0": np.asarray([0.0, 0.0, 0.0, -1.0, 0.0, 0.0]) * self.sensitivity,
-            # 减号和等号键，支持多种可能的格式
+            # Minus and equals keys, supporting multiple possible formats
             "KEY_MINUS": np.asarray([0.0, 0.0, 0.0, 0.0, -1.0, 0.0]) * self.sensitivity,
             "KEY_EQUALS": np.asarray([0.0, 0.0, 0.0, 0.0, 0.0, -1.0])
             * self.sensitivity,

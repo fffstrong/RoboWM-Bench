@@ -1,0 +1,251 @@
+#usda 1.0
+(
+    customLayerData = {
+        dictionary cameraSettings = {
+            dictionary Front = {
+                double3 position = (5, 0, 0)
+                double radius = 5
+            }
+            dictionary Perspective = {
+                double3 position = (0.539463390641655, 0.3044793543574439, 0.24168095834629297)
+                double3 target = (-0.026544394584498532, -0.15452873433309122, 0.09717055729383348)
+            }
+            dictionary Right = {
+                double3 position = (0, -5, 0)
+                double radius = 5
+            }
+            dictionary Top = {
+                double3 position = (0, 0, 5)
+                double radius = 5
+            }
+            string boundCamera = "/OmniverseKit_Persp"
+        }
+        dictionary omni_layer = {
+            string authoring_layer = "./model_faucet_7.usda"
+        }
+        dictionary renderSettings = {
+            double "rtx:translucency:worldEps" = 0.05
+        }
+    }
+    defaultPrim = "root"
+    metersPerUnit = 1
+    subLayers = [
+        @./resource/material.usda@,
+        @./resource/v_0/link_default_0.usda@
+    ]
+    upAxis = "Z"
+)
+
+over "root" (
+    prepend apiSchemas = ["SemanticsAPI:Semantics_SMmi"]
+    kind = "component"
+)
+{
+    string semantic:Semantics_SMmi:params:semanticData = "faucet"
+    string semantic:Semantics_SMmi:params:semanticType = "class"
+
+    over "E_switch_1" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "SemanticsAPI:Semantics_ZyvL"]
+    )
+    {
+        bool physics:kinematicEnabled = 0
+        bool physics:rigidBodyEnabled = 1
+        string semantic:Semantics_ZyvL:params:semanticData = "handle"
+        string semantic:Semantics_ZyvL:params:semanticType = "class"
+
+        over "P_aab7ac011762e607" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </root/materials/Steel_Carbon> (
+                bindMaterialAs = "weakerThanDescendants"
+            )
+        }
+
+        def PhysicsRevoluteJoint "joint_0" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        )
+        {
+            float drive:angular:physics:damping = 7
+            float drive:angular:physics:stiffness = 0
+            float drive:angular:physics:targetPosition = -120
+            uniform token drive:angular:physics:type = "acceleration"
+            uniform token physics:axis = "Z"
+            rel physics:body0 = </root/E_body_2>
+            rel physics:body1 = </root/E_switch_1>
+            float physics:breakForce = inf
+            float physics:breakTorque = inf
+            point3f physics:localPos0 = (-0.0052173, -0.0012436, 0.0274565)
+            point3f physics:localPos1 = (0, 0, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (1, 0, 0, 0)
+            float physics:lowerLimit = -120
+            float physics:upperLimit = 0
+        }
+    }
+
+    over "E_body_2" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "PhysicsArticulationRootAPI", "PhysxArticulationAPI"]
+    )
+    {
+        bool physics:kinematicEnabled = 0
+        bool physics:rigidBodyEnabled = 1
+        bool physxArticulation:enabledSelfCollisions = 0
+
+        over "P_9570d4454cf2d2a3" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </root/materials/Steel_Carbon> (
+                bindMaterialAs = "weakerThanDescendants"
+            )
+        }
+    }
+
+    over "E_pipe_3" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysxRigidBodyAPI", "SemanticsAPI:Semantics_6qfP"]
+    )
+    {
+        bool physics:kinematicEnabled = 0
+        bool physics:rigidBodyEnabled = 1
+        string semantic:Semantics_6qfP:params:semanticData = "pipe"
+        string semantic:Semantics_6qfP:params:semanticType = "class"
+
+        over "P_39f36f2a801ad2a3" (
+            prepend apiSchemas = ["MaterialBindingAPI"]
+        )
+        {
+            rel material:binding = </root/materials/Steel_Carbon> (
+                bindMaterialAs = "weakerThanDescendants"
+            )
+        }
+
+        def PhysicsRevoluteJoint "joint_1" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        )
+        {
+            float drive:angular:physics:damping = 100
+            float drive:angular:physics:stiffness = 100
+            float drive:angular:physics:targetPosition = -90
+            uniform token drive:angular:physics:type = "acceleration"
+            uniform token physics:axis = "Z"
+            rel physics:body0 = </root/E_body_2>
+            rel physics:body1 = </root/E_pipe_3>
+            float physics:breakForce = inf
+            float physics:breakTorque = inf
+            point3f physics:localPos0 = (0.016055, -0.0020895, 0.0339067)
+            point3f physics:localPos1 = (0, 0, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (1, 0, 0, 0)
+            float physics:lowerLimit = -90
+            float physics:upperLimit = 0
+        }
+    }
+
+    over "materials"
+    {
+        over "mat_1130292"
+        {
+            over "PBRShader"
+            {
+                float inputs:clearcoat = 0.32
+                float inputs:metallic = 0.17
+                float inputs:roughness = 0.29
+            }
+        }
+
+        def Material "Steel_Carbon"
+        {
+            token outputs:mdl:displacement.connect = </root/materials/Steel_Carbon/Shader.outputs:out>
+            token outputs:mdl:surface.connect = </root/materials/Steel_Carbon/Shader.outputs:out>
+            token outputs:mdl:volume.connect = </root/materials/Steel_Carbon/Shader.outputs:out>
+
+            def Shader "Shader"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                uniform asset info:mdl:sourceAsset = @./NVIDIA/Materials/2023_2_1/Base/Metals/Steel_Carbon.mdl@
+                uniform token info:mdl:sourceAsset:subIdentifier = "Steel_Carbon"
+                token outputs:out (
+                    renderType = "material"
+                )
+            }
+        }
+    }
+
+    def PhysicsFixedJoint "FixedJoint"
+    {
+        rel physics:body1 = </root/E_body_2>
+        float physics:breakForce = inf
+        float physics:breakTorque = inf
+        point3f physics:localPos0 = (0, 0, 0)
+        point3f physics:localPos1 = (0, 0, 0)
+        quatf physics:localRot0 = (1, 0, 0, 0)
+        quatf physics:localRot1 = (1, 0, 0, 0)
+    }
+}
+
+def "Render" (
+    hide_in_stage_window = true
+    no_delete = true
+)
+{
+    def "OmniverseKit"
+    {
+        def "HydraTextures" (
+            hide_in_stage_window = true
+            no_delete = true
+        )
+        {
+            def RenderProduct "omni_kit_widget_viewport_ViewportTexture_0" (
+                prepend apiSchemas = ["OmniRtxSettingsCommonAdvancedAPI_1", "OmniRtxSettingsRtAdvancedAPI_1", "OmniRtxSettingsPtAdvancedAPI_1", "OmniRtxPostColorGradingAPI_1", "OmniRtxPostChromaticAberrationAPI_1", "OmniRtxPostBloomPhysicalAPI_1", "OmniRtxPostMatteObjectAPI_1", "OmniRtxPostCompositingAPI_1", "OmniRtxPostDofAPI_1", "OmniRtxPostMotionBlurAPI_1", "OmniRtxPostTvNoiseAPI_1", "OmniRtxPostTonemapIrayReinhardAPI_1", "OmniRtxPostDebugSettingsAPI_1", "OmniRtxDebugSettingsAPI_1"]
+                hide_in_stage_window = true
+                no_delete = true
+            )
+            {
+                rel camera = </OmniverseKit_Persp>
+                token omni:rtx:background:source:texture:textureMode = "repeatMirrored"
+                token omni:rtx:background:source:type = "domeLight"
+                bool omni:rtx:dlss:frameGeneration = 0
+                bool omni:rtx:material:db:nonVisualMaterialCSV:enabled = 0
+                bool omni:rtx:material:db:syncLoads = 1
+                token omni:rtx:post:dlss:execMode = "performance"
+                bool omni:rtx:post:registeredCompositing:invertColorCorrection = 1
+                bool omni:rtx:post:registeredCompositing:invertToneMap = 1
+                bool omni:rtx:pt:lightcache:cached:dontResolveConflicts = 1
+                int omni:rtx:pt:maxSamplesPerLaunch = 2073600
+                int omni:rtx:pt:mgpu:maxPixelsPerRegionExponent = 12
+                color3f omni:rtx:rt:ambientLight:color = (0.1, 0.1, 0.1)
+                bool omni:rtx:rt:demoire = 0
+                bool omni:rtx:rt:ecoMode:enabled
+                bool omni:rtx:rt:lightcache:spatialCache:dontResolveConflicts = 1
+                bool omni:rtx:scene:hydra:materialSyncLoads = 1
+                bool omni:rtx:scene:hydra:mdlMaterialWarmup = 1
+                float omni:rtx:translucency:worldEps = 0.05
+                uint omni:rtx:viewTile:limit = 4294967295
+                rel orderedVars = </Render/Vars/LdrColor>
+                custom bool overrideClipRange = 0
+                uniform int2 resolution = (1280, 720)
+            }
+        }
+    }
+
+    def RenderSettings "OmniverseGlobalRenderSettings" (
+        prepend apiSchemas = ["OmniRtxSettingsGlobalRtAdvancedAPI_1", "OmniRtxSettingsGlobalPtAdvancedAPI_1"]
+        no_delete = true
+    )
+    {
+        rel products = </Render/OmniverseKit/HydraTextures/omni_kit_widget_viewport_ViewportTexture_0>
+    }
+
+    def "Vars"
+    {
+        def RenderVar "LdrColor" (
+            hide_in_stage_window = true
+            no_delete = true
+        )
+        {
+            uniform string sourceName = "LdrColor"
+        }
+    }
+}
+
