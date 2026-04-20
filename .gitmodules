@@ -1,0 +1,15 @@
+[submodule "third_party/phantom/submodules/phantom-E2FGVI"]
+	path = third_party/phantom/submodules/phantom-E2FGVI
+	url = https://github.com/MarionLepert/phantom-E2FGVI.git
+[submodule "third_party/phantom/submodules/sam2"]
+	path = third_party/phantom/submodules/sam2
+	url = https://github.com/facebookresearch/sam2.git
+[submodule "third_party/phantom/submodules/phantom-robosuite"]
+	path = third_party/phantom/submodules/phantom-robosuite
+	url = https://github.com/MarionLepert/phantom-robosuite.git
+[submodule "third_party/phantom/submodules/phantom-robomimic"]
+	path = third_party/phantom/submodules/phantom-robomimic
+	url = https://github.com/MarionLepert/phantom-robomimic.git
+[submodule "third_party/phantom/submodules/phantom-hamer"]
+	path = third_party/phantom/submodules/phantom-hamer
+	url = https://github.com/MarionLepert/phantom-hamer.git
