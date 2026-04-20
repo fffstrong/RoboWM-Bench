@@ -1,0 +1,37 @@
+# Default configuration (PHANTOM paper settings)
+debug: false
+verbose: false
+skip_existing: false
+n_processes: 1
+data_root_dir: "../data/raw/"
+processed_data_root_dir: "../data/processed_data/"
+demo_name: ""
+
+# Processing settings
+mode: ["bbox"]  # Default processing mode
+demo_num: null  # Process specific demo number (null = process all videos in the root folder)
+
+# Hand dataset processing settings
+is_hand_dataset: false  # Set to true to process hand_dataset format
+task_name: null  # Task name for hand_dataset (e.g., 'pick', 'push'). null = process all tasks
+video_patterns: null  # Video patterns to filter (e.g., ['*_human_rgb.mp4', '*_veo_rgb.mp4']). null = process all
+frame_idx: null  # Frame index to process (e.g., 0, 1, 2). null = process all frame indices
+
+# Additional settings
+debug_cameras: [] # Add other robomimic cameras like sideview, etc. Warning: this significantly slows down the processing time
+
+
+# EPIC-KITCHENS configuration override
+input_resolution: 720  # 256
+output_resolution: 256  # 256
+robot: "Kinova3"
+gripper: "Robotiq85"
+square: false
+epic: true
+bimanual_setup: "shoulders"
+target_hand: "both"
+constrained_hand: false
+depth_for_overlay: false
+render: false
+camera_intrinsics: "camera/camera_intrinsics_mine_1280.json"  # "camera/camera_intrinsics_epic.json"
+camera_extrinsics: "camera/camera_extrinsics_mine_new.json"  # "camera/camera_extrinsics_ego_bimanual_shoulders.json"

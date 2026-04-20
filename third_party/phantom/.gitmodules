@@ -1,0 +1,15 @@
+[submodule "submodules/phantom-E2FGVI"]
+	path = submodules/phantom-E2FGVI
+	url = https://github.com/MarionLepert/phantom-E2FGVI.git
+[submodule "submodules/sam2"]
+	path = submodules/sam2
+	url = https://github.com/facebookresearch/sam2.git
+[submodule "submodules/phantom-robosuite"]
+	path = submodules/phantom-robosuite
+	url = https://github.com/MarionLepert/phantom-robosuite.git
+[submodule "submodules/phantom-robomimic"]
+	path = submodules/phantom-robomimic
+	url = https://github.com/MarionLepert/phantom-robomimic.git
+[submodule "submodules/phantom-hamer"]
+	path = submodules/phantom-hamer
+	url = https://github.com/MarionLepert/phantom-hamer.git

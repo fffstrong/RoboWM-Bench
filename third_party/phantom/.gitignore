@@ -1,0 +1,14 @@
+*.egg-info
+**/_DATA/*
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+data/processed_with_depth/*
+output_data/*
+!data/processed/.gitkeep
+**/__pycache__/*
+*.pyc
+*.pth
+outputs/*
+phantom/outputs/*
+recorded_raw_data/*
