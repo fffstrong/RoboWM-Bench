@@ -1,3 +1,3 @@
-python /home/jiang/convert.py \
-	--repo-id="019" \
-	--root="/home/feng/lehome_1/outputs/auto_pipeline/019" 
+python tools/convertv21.py \
+	--repo-id="001" \
+	--root="/home/feng/lehome_1/eval_videos/025" 

@@ -1,0 +1,23 @@
+{
+    "state": {
+        "lerobot": {
+            "start": 0,
+            "end": 9
+        }
+    },
+    "action": {
+        "lerobot": {
+            "start": 0,
+            "end": 9
+        }
+    },
+    "video": {
+        "top_view": {
+            "original_key": "observation.images.top_rgb"
+        }
+    },
+    "annotation": {
+        "human.action.task_description": {},
+        "human.validity": {}
+    }
+}

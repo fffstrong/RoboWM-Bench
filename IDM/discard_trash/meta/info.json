@@ -1,0 +1,73 @@
+{
+    "robot_type": "dream",
+    "total_episodes": 10,
+    "total_frames": 919,
+    "total_tasks": 1,
+    "total_videos": 1,
+    "chunks_size": 1000,
+    "total_chunks": 1,
+    "fps": 20,
+    "data_path": "data/chunk-{episode_chunk:03d}/episode_{episode_index:06d}.parquet",
+    "video_path": "videos/chunk-{episode_chunk:03d}/{video_key}/episode_{episode_index:06d}.mp4",
+    "features": {
+        "observation.state": {
+            "dtype": "float32",
+            "shape": [
+                9
+            ],
+            "names": [
+                "motor_0",
+                "motor_1",
+                "motor_2",
+                "motor_3",
+                "motor_4",
+                "motor_5",
+                "motor_6",
+                "motor_7",
+                "motor_8"
+            ]
+        },
+        "action": {
+            "dtype": "float32",
+            "shape": [
+                9
+            ],
+            "names": [
+                "motor_0",
+                "motor_1",
+                "motor_2",
+                "motor_3",
+                "motor_4",
+                "motor_5",
+                "motor_6",
+                "motor_7",
+                "motor_8"
+            ]
+        },
+        "annotation.human.action.task_description": {
+            "dtype": "int64",
+            "shape": [
+                1
+            ]
+        },
+        "observation.images.top_rgb": {
+            "dtype": "video",
+            "shape": [
+                480,
+                640,
+                3
+            ],
+            "names": [
+                "height",
+                "width",
+                "channel"
+            ],
+            "video_info": {
+                "video.fps": 20.0,
+                "video.codec": "mpeg4",
+                "video.pix_fmt": "yuv420p",
+                "video.is_depth_map": false
+            }
+        }
+    }
+}
