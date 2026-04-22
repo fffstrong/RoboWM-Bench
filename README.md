@@ -1,9 +1,24 @@
 <div align="center">
   <h1><b>RoboWM-Bench</b></h1>
-  <p><a href="https://robowm-bench.github.io/RoboWM-Bench/">Project Page</a></p>
+  <hr/>
+  <h2><i>RoboWM-Bench: A Benchmark for Evaluating<br/>World Models in Robotic Manipulation</i></h2>
+  <p>
+    <a href="https://robowm-bench.github.io/RoboWM-Bench/">
+      <img alt="Project Page" src="https://img.shields.io/badge/Project%20Page-robowm--bench.github.io-4b5563?logo=googlechrome&logoColor=white" />
+    </a>
+    <a href="https://arxiv.org/abs/2604.19092">
+      <img alt="arXiv" src="https://img.shields.io/badge/arXiv-2604.19092-b31b1b?logo=arxiv&logoColor=white" />
+    </a>
+    <a href="https://github.com/fffstrong/RoboWM-Bench">
+      <img alt="Code" src="https://img.shields.io/badge/Code-GitHub-111827?logo=github&logoColor=white" />
+    </a>
+    <a href="https://huggingface.co/fffstrong/robowmbench-idm">
+      <img alt="IDM Weights" src="https://img.shields.io/badge/IDM%20Weights-Hugging%20Face-f59e0b?logo=huggingface&logoColor=white" />
+    </a>
+  </p>
   <p>
     <a href="img/teaser.pdf">
-      <img src="img/teaser.png" alt="RoboWM-Bench teaser" width="900" />
+      <img src="img/teaser.png" alt="RoboWM-Bench teaser" width="1000" style="max-width: 100%; height: auto;" />
     </a>
   </p>
 </div>
@@ -20,6 +35,7 @@ RoboWM-Bench provides Isaac Lab simulation tasks (with a LeHome-style layout) an
 - [World Model Inputs](#world-model-inputs)
 - [IDM](#idm)
 - [Evaluation](#evaluation)
+- [Citation](#citation)
 - [Roadmap](#roadmap)
 
 ## Installation
@@ -134,3 +150,19 @@ python scripts/robot/eval_franka.py \
 ## Roadmap
 
 - Open-source the pure-simulation tasks + evaluation code, and release the corresponding IDM weights (target: mid-May).
+
+## Citation
+
+If you find RoboWM-Bench useful, please cite:
+
+```bibtex
+@misc{jiang2026robowmbenchbenchmarkevaluatingworld,
+      title={RoboWM-Bench: A Benchmark for Evaluating World Models in Robotic Manipulation}, 
+      author={Feng Jiang and Yang Chen and Kyle Xu and Yuchen Liu and Haifeng Wang and Zhenhao Shen and Jasper Lu and Shengze Huang and Yuanfei Wang and Chen Xie and Ruihai Wu},
+      year={2026},
+      eprint={2604.19092},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2604.19092}, 
+}
+```
