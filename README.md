@@ -93,7 +93,7 @@ Please refer to NVIDIA DreamGen (GR00T-dreams) for the IDM section: `https://git
 
 - Replace `data_config_idm.py` with `IDM/data_config_idm.py`.
 - `IDM/discard_trash` is a reference input dataset. Make sure your dataset `meta` matches the reference, especially **`modality`** and **`stats`**.
-- IDM weights: **TODO (not released yet)**.
+- IDM weights (open-sourced): `https://huggingface.co/fffstrong/robowmbench-idm`.
 
 IDM inference command:
 
