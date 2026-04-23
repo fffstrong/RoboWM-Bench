@@ -1,0 +1,47 @@
+{
+    "id": 0,
+    "asset_path": "Assets/human_assets/Towel/towel.usd",
+    "visual_usd_paths": [],
+    "scale": [
+        0.5,
+        0.5,
+        0.5
+    ],
+    "check_point": [
+        2761,
+        2662,
+        26970,
+        15922,
+        16281,
+        27536
+    ],
+    "initial_pos_range": [
+        2.6622827, -1.94822, 0.64,
+        2.6622827, -1.94822, 0.64
+    ],
+    "initial_rot_range": [
+        90.0,
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "soft_reset_pos_range": [
+        2.6622827, -1.94822, 0.64,
+        2.6622827, -1.94822, 0.64
+    ],
+    "soft_reset_rot_range": [
+        90.0,
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "success_distance": [
+        15,
+        15,
+        15
+    ]
+}
