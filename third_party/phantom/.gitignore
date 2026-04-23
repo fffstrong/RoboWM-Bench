@@ -2,10 +2,12 @@
 **/_DATA/*
 data/raw/*
 !data/raw/.gitkeep
+!data/raw/hand_dataset/
 data/processed/*
 data/processed_with_depth/*
 output_data/*
 !data/processed/.gitkeep
+!data/processed/hand_dataset/
 **/__pycache__/*
 *.pyc
 *.pth

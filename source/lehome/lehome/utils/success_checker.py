@@ -4,8 +4,9 @@ import torch
 from lehome.utils.logger import get_logger
 logger = get_logger(__name__)
 
+
 def step_interval(interval=50):
-    """工厂函数：创建一个可自定义步长的装饰器"""
+    """Factory function: Create a decorator with a customizable step size"""
 
     def decorator(func):
         call_count = 0
@@ -24,13 +25,6 @@ def step_interval(interval=50):
     return decorator
 
 
-# def calculate_distance(point_a, point_b):
-#     # calculate distance
-#     point_a = np.array(point_a)
-#     point_b = np.array(point_b)
-#     return np.linalg.norm(point_a - point_b)
-
-
 def get_object_particle_position(particle_object, index_list):
     position = (
         particle_object._cloth_prim_view.get_world_positions()
@@ -44,6 +38,7 @@ def get_object_particle_position(particle_object, index_list):
     for index in index_list:
         select_position.append(tuple(position[index]))
     return select_position
+
 
 def get_cloth_object_particle_position(particle_object, index_list):
     try:
@@ -64,27 +59,6 @@ def get_cloth_object_particle_position(particle_object, index_list):
     positions = (mesh_points[index_list] * 100).tolist()
     return positions
 
-def get_fluid_position(fluid_object, sample_count: int = 100, global_coord: bool = False):
-    """
-    随机抽取流体粒子位置。
-
-    Args:
-        fluid_object: FluidObject 实例，需实现 get_particle_positions。
-        sample_count: 抽取粒子数量，超过总数则返回全部。
-        global_coord: 是否返回全局坐标。
-
-    Returns:
-        list[tuple]: 抽取到的粒子坐标列表。
-    """
-    positions, _, _ = fluid_object.get_particle_positions(
-        visualize=False, global_coord=global_coord
-    )
-    if len(positions) == 0:
-        return []
-
-    sample_count = min(sample_count, len(positions))
-    indices = np.random.choice(len(positions), size=sample_count, replace=False)
-    return [tuple(positions[i]) for i in indices]
 
 @step_interval(interval=10)
 def success_checker_pick(
@@ -98,9 +72,8 @@ def success_checker_pick(
     success = (
         abs(a_z-ori_z)>0.05
     )
-    # print(f"[Pick] ori_z={ori_z}, a_z={a_z}")
-    # print(f"[Pick] success={success}")
     return bool(success)
+
 
 def success_checker_pick_once(
     rigid_object_a, ori_z,env_id: int = 0
@@ -113,54 +86,9 @@ def success_checker_pick_once(
     success = (
         abs(a_z-ori_z)>0.05
     )
-    # print(f"[Pick] ori_z={ori_z}, a_z={a_z}")
-    # print(f"[Pick] success={success}")
     return bool(success)
-
-# @step_interval(interval=50)
-def success_checker_pour(
-    fluid_object,
-    sample_count: int = 100,
-    xy_tolerance: float = 0.08,
-    z_tolerance: float = 0.12,
-    success_ratio: float = 0.7,
-):
-    """
-    检查流体是否“倒入”容器：随机取部分粒子，判断是否有足够比例落在容器附近。
-
-    Args:
-        fluid_object: FluidObject 实例，需要实现 get_particle_positions 和 container.get_world_pose。
-        sample_count: 随机抽取粒子数。
-        xy_tolerance: 粒子与容器中心在 xy 平面的容差（米）。
-        success_ratio: 满足条件的粒子比例阈值。
-
-    Returns:
-        bool: True 表示达到成功条件。
-    """
-    particles, _, _ = fluid_object.get_particle_positions(visualize=False, global_coord=True)
-    if len(particles) == 0:
-        return False
-
-    sample_count = min(sample_count, len(particles))
-    indices = np.random.choice(len(particles), size=sample_count, replace=False)
-    sampled = np.array([particles[i] for i in indices], dtype=np.float32)
-
-    # 使用 loft_water_cfg 中 bowl 的初始化位置作为容器中心
-
-    from lehome.tasks.livingroom.loft_water_cfg import LoftWaterEnvCfg
-
-    cfg = LoftWaterEnvCfg()
-    container_pos = np.array(cfg.bowl.init_state.pos, dtype=np.float32)
-# container_pos: [2.91405, 0.87336, 0.83]
-
-    diff = np.abs(sampled - container_pos)
-    in_xy = (diff[:, 0] <= xy_tolerance) & (diff[:, 1] <= xy_tolerance)
-    in_z = diff[:, 2] <= z_tolerance
-    inside = in_xy & in_z
-
-    ratio = inside.mean() if len(inside) > 0 else 0.0
-    return bool(ratio >= success_ratio)
     
+
 @step_interval(interval=50)
 def success_checker_orangeinbowl(
     bowl_object_a, bowl_object_b
@@ -183,11 +111,12 @@ def success_checker_orangeinbowl(
     )
     return bool(success)
 
+
 @step_interval(interval=5)
 def success_checker_bowlinplate(
     rigid_object_a, rigid_object_b, env_id: int = 0
 ):
-    pos_a = rigid_object_a.data.root_pos_w[env_id]      # (3,)
+    pos_a = rigid_object_a.data.root_pos_w[env_id]
     pos_b = rigid_object_b.data.root_pos_w[env_id]
     a_x = pos_a[0].item()
     a_y = pos_a[1].item()
@@ -199,6 +128,7 @@ def success_checker_bowlinplate(
         and calculate_distance(a_y, b_y) <= 0.15
     )
     return bool(success)
+
 
 # @step_interval(interval=50)
 def success_checker_fold(
@@ -253,11 +183,13 @@ def success_checker_burger(beef_pos, plate_pos):
 def success_checker_cut(sausage_count: int) -> bool:
     return sausage_count >= 2
 
+
 def calculate_distance_2D(point_a, point_b):
-    """计算二维坐标点的直线距离"""
+    """Calculate the straight-line distance between 2D coordinate points"""
     a = np.array(point_a, dtype=np.float32).reshape(-1)[:2]
     b = np.array(point_b, dtype=np.float32).reshape(-1)[:2]
     return float(np.linalg.norm(a - b))
+
 
 def calculate_distance(point_a, point_b):
     # Calculate distance
@@ -265,11 +197,12 @@ def calculate_distance(point_a, point_b):
     point_b = np.array(point_b)
     return np.linalg.norm(point_a - point_b)
 
+
 @step_interval(interval=50)
 def success_checker_pickandplace(
     rigid_object_a, rigid_object_b, env_id: int = 0
 ):
-    pos_a = rigid_object_a.data.root_pos_w[env_id]      # (3,)
+    pos_a = rigid_object_a.data.root_pos_w[env_id]
     pos_b = rigid_object_b.data.root_pos_w[env_id]
     a_x = pos_a[0].item()
     a_y = pos_a[1].item()
@@ -277,27 +210,25 @@ def success_checker_pickandplace(
     b_y = pos_b[1].item()
 
     print(calculate_distance_2D((a_x, a_y), (b_x, b_y)))
-    # print(calculate_distance(a_y,b_y))
 
     success = (
         calculate_distance_2D((a_x, a_y), (b_x, b_y))<= 0.05
     )
     return bool(success)
 
+
 @step_interval(interval=5)
 def success_checker_pull(
-    rigid_object_a,ori_x, env_id: int = 0
+    rigid_object_a, ori_x, env_id: int = 0
 ):
     env_id = int(env_id)
     pos_a = rigid_object_a.data.root_pos_w[env_id] 
-    a_x = pos_a[0].item()     # (3,)
-    # print(f"Object A position: {pos_a} | Target ori_x: {ori_x} |  {abs(a_x-ori_x)}")
-    
-
+    a_x = pos_a[0].item()
     success = (
-        abs(a_x-ori_x)>0.03
+        abs(a_x-ori_x) > 0.03
     )
     return bool(success)
+
 
 @step_interval(interval=30)
 def success_checker_rubbish(food_rubbish01_pos, food_rubbish02_pos, food_rubbish03_pos, desktop_dustpan_pos, dustpan_size_x=0.15, dustpan_size_y=0.15):
@@ -321,6 +252,7 @@ def success_checker_rubbish(food_rubbish01_pos, food_rubbish02_pos, food_rubbish
     success = success_mask.any().item()
     
     return bool(success)
+
 
 @step_interval(interval=50)
 def success_checker_fold(
@@ -382,6 +314,7 @@ def check_top_sleeve(p, success_distance):
 
     return cond1 and cond2 and cond3 and cond4 and cond5, details
 
+
 def check_pant_long(p, success_distance):
     dist_0_4 = calculate_distance(p[0], p[4])
     dist_0_2 = calculate_distance(p[0], p[2])   
@@ -418,6 +351,7 @@ def check_pant_long(p, success_distance):
         },
     }
     return cond1 and cond2 and cond3 and cond4, details
+
 
 def check_pant_short(p, success_distance):
     dist_0_1 = calculate_distance(p[0], p[1])
@@ -482,43 +416,83 @@ def success_checker_garment_fold(particle_object, garment_type: str):
 
     return result
 
-@step_interval(interval=50)
-def success_checker_fling(
-    particle_object, index_list=[8077, 1711, 2578, 3942, 8738, 588]
-):
-    p = get_object_particle_position(particle_object, index_list)
+@step_interval(interval=20)
+def success_checker_pour_water(
+    fluid_object,
+    container_object,
+    env_id: int = 0,
+    xy_tolerance: float = 0.02,
+    z_tolerance: float = 0.5,
+    success_ratio: float = 0.01,
+) -> bool:
+    """
+    General fluid pour checker. Determines if at least the success_ratio proportion of fluid falls into the target container (container_object).
+    """
+    particles, _, _ = fluid_object.get_particle_positions(visualize=False, global_coord=True)
+    if len(particles) == 0:
+        return False
 
-    def xy_distance(a, b):
-        return np.linalg.norm(np.array(a[:2]) - np.array(b[:2]))
+    sampled = np.array(particles, dtype=np.float32)
+    total_particles = len(sampled)
 
-    def z_distance(a, b):
-        return abs(a[2] - b[2])
+    # Get the current world coordinates of the target container
+    pos_target = container_object.data.root_pos_w[env_id].detach().cpu().numpy()  # (3,)
+    container_pos = np.array(pos_target, dtype=np.float32)
+    print(f"Pour Check: Container position: {container_pos}")
 
-    success = (
-        xy_distance(p[0], p[4]) > 18
-        and z_distance(p[0], p[4]) < 2
-        and xy_distance(p[1], p[5]) > 18
-        and z_distance(p[1], p[5]) < 2
-    )
+    # Calculate the difference between particles and the container center
+    diff = np.abs(sampled - container_pos)
 
+    # x and y directions are limited by the cup opening radius, z direction is only calculated downwards to a certain depth
+    in_xy = (diff[:, 0] <= xy_tolerance) & (diff[:, 1] <= xy_tolerance)
+    print(f"Pour Check: {in_xy.sum()} particles within XY tolerance out of {total_particles} total particles.")
+    in_z = diff[:, 2] <= z_tolerance
+
+    inside = in_xy & in_z
+    print(f"Pour Check: {inside.sum()} particles inside the container out of {total_particles} total particles.")
+
+    ratio = inside.mean() if len(inside) > 0 else 0.0
+    print(f"Pour Check: {inside.sum()}/{total_particles} particles inside, ratio={ratio:.4f}")
+    return bool(ratio >= success_ratio)
+
+
+@step_interval(interval=10)
+def success_checker_push_button(contact_sensor, env_id: int = 0) -> bool:
+    """
+    Check if the button is touched by the robotic arm (or any specified contact object in the scene)
+    Use contact_sensor to get the net forces or contact forces of the target object.
+    """
+    forces = contact_sensor.data.net_forces_w[env_id]
+    
+    # Calculate force magnitude
+    force_magnitude = torch.norm(forces, dim=-1)
+    
+    threshold = 0.5
+    
+    # Determine if the force on any part exceeds this threshold
+    success = (force_magnitude > threshold).any().item()
+    
     return bool(success)
 
 
-@step_interval(interval=30)
-def success_checker_burger(beef_pos, plate_pos):
-    diff_xy = beef_pos[:, :2] - plate_pos[:, :2]
-    dist_xy = torch.linalg.norm(diff_xy, dim=-1)
+@step_interval(interval=10)
+def success_checker_stack_cup(rigid_object_a, rigid_object_b, env_id: int = 0) -> bool:
+    """
+    Check if two cups are successfully stacked.
+    Judgment criteria: XY horizontal distance less than 2.5 cm, Z-axis height difference less than 4 cm.
+    """
+    pos_a = rigid_object_a.data.root_pos_w[env_id]
+    pos_b = rigid_object_b.data.root_pos_w[env_id]
 
-    # z distance
-    diff_z = torch.abs(beef_pos[:, 2] - plate_pos[:, 2])
+    a_x, a_y, a_z = pos_a[0].item(), pos_a[1].item(), pos_a[2].item()
+    b_x, b_y, b_z = pos_b[0].item(), pos_b[1].item(), pos_b[2].item()
 
-    # Success condition: xy < 0.045 and z < 0.03
-    success_mask = (dist_xy < 0.045) & (diff_z < 0.03)
-    success = success_mask.any().item()
+    # Calculate Euclidean distance on the horizontal plane
+    xy_distance = ((a_x - b_x) ** 2 + (a_y - b_y) ** 2) ** 0.5
+    # Calculate vertical height difference
+    z_distance = abs(a_z - b_z)
+
+    # Set judgment thresholds: horizontal deviation < 0.025 m (2.5cm), height deviation < 0.04 m (4cm)
+    success = (xy_distance <= 0.025) and (z_distance <= 0.04)
 
     return bool(success)
-
-
-@step_interval(interval=6)
-def success_checker_cut(sausage_count: int) -> bool:
-    return sausage_count >= 2

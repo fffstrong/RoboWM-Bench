@@ -17,7 +17,7 @@ import random
 
 from .idm_cfg import IDMEnvCfg
 from lehome.utils.success_checker import success_checker_bowlinplate
-from lehome.assets.scenes.kitchen import KITCHEN_NOTABLE_USD_PATH
+from source.lehome.lehome.assets.scenes.byobu_table import KITCHEN_NOTABLE_USD_PATH
 from lehome.devices.action_process import preprocess_device_action
 # from lehome.assets.object.Garment import GarmentObject
 from lehome.assets.object.fluid import BowlObject
