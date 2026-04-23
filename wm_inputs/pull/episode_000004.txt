@@ -1,0 +1,1 @@
+The robotic arm pulls the white tape roll on the table inward a short distance. Throughout the entire sequence, the gripper undergoes no structural deformation, only the opening angle of its jaws changes; the rotational movements of the robotic arm joints strictly adhere to its inherent mechanical structure; and the camera perspective remains completely unchanged.
