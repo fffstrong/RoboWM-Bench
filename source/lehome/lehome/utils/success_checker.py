@@ -130,6 +130,16 @@ def success_checker_bowlinplate(
     return bool(success)
 
 
+def success_checker_lifted(
+    rigid_object_a, ori_z, env_id: int = 0
+) -> bool:
+    pos_a = rigid_object_a.data.root_pos_w[env_id]
+
+    a_z = pos_a[2].item()
+    success = (a_z - ori_z) > 0.08
+    return bool(success)
+
+
 # @step_interval(interval=50)
 def success_checker_fold(
     particle_object, index_list=[8077, 1711, 2578, 3942, 8738, 588]
@@ -438,21 +448,21 @@ def success_checker_pour_water(
     # Get the current world coordinates of the target container
     pos_target = container_object.data.root_pos_w[env_id].detach().cpu().numpy()  # (3,)
     container_pos = np.array(pos_target, dtype=np.float32)
-    print(f"Pour Check: Container position: {container_pos}")
+    # print(f"Pour Check: Container position: {container_pos}")
 
     # Calculate the difference between particles and the container center
     diff = np.abs(sampled - container_pos)
 
     # x and y directions are limited by the cup opening radius, z direction is only calculated downwards to a certain depth
     in_xy = (diff[:, 0] <= xy_tolerance) & (diff[:, 1] <= xy_tolerance)
-    print(f"Pour Check: {in_xy.sum()} particles within XY tolerance out of {total_particles} total particles.")
+    # print(f"Pour Check: {in_xy.sum()} particles within XY tolerance out of {total_particles} total particles.")
     in_z = diff[:, 2] <= z_tolerance
 
     inside = in_xy & in_z
-    print(f"Pour Check: {inside.sum()} particles inside the container out of {total_particles} total particles.")
+    # print(f"Pour Check: {inside.sum()} particles inside the container out of {total_particles} total particles.")
 
     ratio = inside.mean() if len(inside) > 0 else 0.0
-    print(f"Pour Check: {inside.sum()}/{total_particles} particles inside, ratio={ratio:.4f}")
+    # print(f"Pour Check: {inside.sum()}/{total_particles} particles inside, ratio={ratio:.4f}")
     return bool(ratio >= success_ratio)
 
 

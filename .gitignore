@@ -1,3 +1,8 @@
-
 /tmp/
 **/pip-unpack-*/
+logs/*
+__pycache__/
+*.py[cod]
+*$py.class
+logs/
+*.log

@@ -18,7 +18,7 @@ TASK_PART_SCORES_MAP = {
         2: "Lift",
         3: "In Plate"
     },
-    "Task06_Franka_Tableware_Stapler_Box":{
+    "Task06_Franka_Tableware_Stapler_Box": {
         1: "Contact",
         2: "Lift",
         3: "In Box"
@@ -34,7 +34,7 @@ TASK_PART_SCORES_MAP = {
 
 # -- Args Setup --
 parser = argparse.ArgumentParser()
-parser.add_argument("--task_name", type=str, default="Task05_Franka_Tableware_Stack_Cup", help="Task folder name, e.g., Task01_Franka-Tableware_Cube")
+parser.add_argument("--task_name", type=str, default="Task10_Franka_Tableware_Towel", help="Task folder name, e.g., Task01_Franka-Tableware_Cube")
 parser.add_argument("--model_name", type=str, default="human", help="Model name, e.g., human or veo")
 parser.add_argument("--debug", action="store_true", help="Whether to print detailed error comparison info")
 parser.add_argument("--num_envs", type=int, default=1)

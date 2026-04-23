@@ -66,7 +66,7 @@ class TablewareEnv(DirectRLEnv):
         self.scene.rigid_objects["object_A"] = self.object_A
         self.scene.rigid_objects["object_B"] = self.object_B
 
-        fluid_config_path = "source/lehome/lehome/tasks/human_task/Task06_Franka_Tableware_Pour_Water/config_file/fluid.yaml"
+        fluid_config_path = "source/lehome/lehome/tasks/human_task/Task07_Franka_Tableware_Pour_Water/config_file/fluid.yaml"
         fluid_usd_path = "Assets/human_assets/water.usdc"
 
         self.fluid_object = FluidObject(

@@ -371,7 +371,7 @@ class TablewareEnv(DirectRLEnv):
         object_A_default_pos = self.object_A.data.default_root_state[env_ids, :3]
         object_A_pos = self.object_A.data.root_pos_w[env_ids]
 
-        lift_height_threshold = 0.05
+        lift_height_threshold = 0.08
         place_distance_threshold = 0.05
 
         # 1: Touch left

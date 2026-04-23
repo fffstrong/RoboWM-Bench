@@ -32,7 +32,7 @@ class TowelEnv(DirectRLEnv):
         self.object_A = None  # Will be created in _setup_scene
         self.garment_config = OmegaConf.load("Assets/human_assets/Towel/Towel.json")
         self.particle_config = OmegaConf.load(
-            "source/lehome/lehome/tasks/human_task/Task09_Franka_Tableware_Towel/config_file/particle_garment_cfg.yaml"
+            "source/lehome/lehome/tasks/human_task/Task10_Franka_Tableware_Towel/config_file/particle_garment_cfg.yaml"
         )
         if cfg.use_random_seed:
             # Use random seed (no fixed seed)

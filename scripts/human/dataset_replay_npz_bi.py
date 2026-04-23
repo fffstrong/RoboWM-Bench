@@ -30,7 +30,7 @@ TASK_PART_SCORES_MAP = {
 
 # -- Args Setup --
 parser = argparse.ArgumentParser()
-parser.add_argument("--task_name", type=str, default="Task11_Bi_Franka_Tableware_Big_Box", help="Task folder name")
+parser.add_argument("--task_name", type=str, default="Task11_Bi_Franka_Tableware_Cook", help="Task folder name")
 parser.add_argument("--model_name", type=str, default="human", help="Model name, e.g., human or veo")
 parser.add_argument("--debug", action="store_true", help="Print detailed error comparisons")
 parser.add_argument("--num_envs", type=int, default=1)
