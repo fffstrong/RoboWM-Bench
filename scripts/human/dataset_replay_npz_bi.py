@@ -63,6 +63,7 @@ from isaaclab.markers import VisualizationMarkers
 from isaaclab.markers.config import FRAME_MARKER_CFG
 import lehome.tasks.human_task
 
+
 def calculate_action(
     target_pos, target_rot_mat, current_pos, current_quat, pos_gain, rot_gain, device
 ):
@@ -155,13 +156,13 @@ def main():
 
     for traj_id in range(10):
         # Bi-manual Trajectory Paths
-        traj_path_left = os.path.join(
-            args.task_dir, str(traj_id), f"{traj_id}_{args.model_name}_left_black",
-            "smoothing_processor", "smoothed_actions_left_single_arm.npz"
-        )
         traj_path_right = os.path.join(
-            args.task_dir, str(traj_id), f"{traj_id}_{args.model_name}_right_black",
+            args.task_dir, str(traj_id), f"{traj_id}_{args.model_name}_left_black",
             "smoothing_processor", "smoothed_actions_right_single_arm.npz"
+        )
+        traj_path_left = os.path.join(
+            args.task_dir, str(traj_id), f"{traj_id}_{args.model_name}_right_black",
+            "smoothing_processor", "smoothed_actions_left_single_arm.npz"
         )
 
         if not os.path.exists(traj_path_left) or not os.path.exists(traj_path_right):

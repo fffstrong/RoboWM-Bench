@@ -1,8 +1,15 @@
 import cv2
+import argparse
+import os
 
-# Set input and output filenames (please modify according to your actual filenames)
-input_video = 'data/raw/hand_dataset/box_bi/2/2_human_rgb.mp4'  # Replace with your input video path
-output_video = 'data/raw/hand_dataset/box_bi/2/2_human_right_black_rgb.mp4'  # Replace with your output video path
+parser = argparse.ArgumentParser(description="Cover half of the video to keep only one hand.")
+parser.add_argument("--input_video", type=str, required=True, help="Input video path")
+args = parser.parse_args()
+
+input_video = args.input_video
+base_name, ext = os.path.splitext(input_video)
+output_video_left_masked = f"{base_name}_left_black{ext}"
+output_video_right_masked = f"{base_name}_right_black{ext}"
 
 # Open the video
 cap = cv2.VideoCapture(input_video)
@@ -22,7 +29,8 @@ half_width = width // 2
 
 # Set the codec and parameters for the output video (mp4v is suitable for .mp4 files)
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-out = cv2.VideoWriter(output_video, fourcc, fps, (width, height))
+out_left = cv2.VideoWriter(output_video_left_masked, fourcc, fps, (width, height))
+out_right = cv2.VideoWriter(output_video_right_masked, fourcc, fps, (width, height))
 
 print("Starting to process the video, please wait...")
 
@@ -33,13 +41,22 @@ while True:
     if not ret:
         break
 
-    # Core code: Set the entire height [:] and half the width [half_width:] to pure black (B=0, G=0, R=0)
-    frame[:, half_width:] = (0, 0, 0)  # half_width: is for the left hand, if you want to cover the right hand, change it to frame[:, half_width:] = (0, 0, 0)
+    # Create copies to avoid overwriting the original frame for both modifications
+    frame_left_masked = frame.copy()
+    frame_right_masked = frame.copy()
 
-    # Write the modified frame to the output video
-    out.write(frame)
+    # Mask left hand (covers left half)
+    frame_left_masked[:, :half_width] = (0, 0, 0)
+    
+    # Mask right hand (covers right half)
+    frame_right_masked[:, half_width:] = (0, 0, 0)
+
+    # Write the modified frames back
+    out_left.write(frame_left_masked)
+    out_right.write(frame_right_masked)
 
 # Release all resources
 cap.release()
-out.release()
-print(f"Processing complete! Video saved as: {output_video}")
+out_left.release()
+out_right.release()
+print(f"Processing complete! Videos saved as:\n- {output_video_left_masked}\n- {output_video_right_masked}")

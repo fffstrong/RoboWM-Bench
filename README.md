@@ -26,7 +26,8 @@
 RoboWM-Bench provides Isaac Lab simulation tasks (with a LeHome-style layout) and tooling to:
 - replay robot trajectories to generate masked RGB/depth data for IDM training
 - run IDM inference and convert model outputs into action JSON trajectories
-- evaluate Franka tasks in simulation and optionally record cameras / per-step scores
+- extract human hand motions using our customized Phantom algorithum
+- evaluate Franka and Human tasks in simulation and optionally record cameras / per-step scores
 
 ## Table of Contents
 - [Installation](#installation)
@@ -34,6 +35,7 @@ RoboWM-Bench provides Isaac Lab simulation tasks (with a LeHome-style layout) an
 - [Replay: Generate IDM Training Data](#replay-generate-idm-training-data)
 - [World Model Inputs](#world-model-inputs)
 - [IDM](#idm)
+- [Phantom Hand Motion Extraction](#phantom-hand-motion-extraction)
 - [Evaluation](#evaluation)
 - [Citation](#citation)
 - [Roadmap](#roadmap)
@@ -72,6 +74,9 @@ git checkout v2.3.0
 # Optional: extra utilities
 pip install open3d
 ```
+Install Phantom for human action extraction
+
+We strongly recomand creating a new virtual environment to run the human hand pose extraction codes. Please refer to [phantom repository](https://github.com/MarionLepert/phantom) for installation.
 
 ## Project Layout
 
@@ -101,7 +106,11 @@ python scripts/eval/replay_franka.py \
 
 ## World Model Inputs
 
-World model inputs (RGB frames and prompts) are under the `wm_inputs` folder.
+- **Robot Tasks**: Initial RGB frames and text prompts are located in the `wm_inputs` directory.
+
+- **Human Tasks**: Initial RGB frames and text prompts are located in `third_party/phantom/data/raw/hand_dataset`. 
+  - **Video Placement**: Please place your model-generated human manipulation videos under the corresponding task and index directory: `third_party/phantom/data/raw/hand_dataset/TASK_NAME/X/`.
+  - **Naming Convention**: Ensure the videos are named using the format `X_MODELNAME_rgb.mp4` (e.g., `0_veo_rgb.mp4`). Here, `X` represents the video index, and `MODELNAME` indicates the name of the World Model used for generation.
 
 ## IDM
 
@@ -122,7 +131,52 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python IDM_dump/dump_idm_actions.py \
     --video_indices "0 16"
 ```
 
+## Phantom Hand Motion Extraction
+
+### For Single Arm Task
+
+```bash
+cd third_party/phantom/phantom
+
+python process_data.py   is_hand_dataset=true   task_name=TASK_NAME  video_patterns='*_MODELNAME_rgb.mp4'  'mode=[bbox,hand2d,action,smoothing]'   data_root_dir=../data/raw   processed_data_root_dir=../data/processed
+```
+
+- `TASK_NAME` can be one of the following:
+  - `Task01_Franka_Tableware_Cube`
+  - `Task02_Franka_Tableware_Banana`
+  - `Task03_Franka_Tableware_Push_Button`
+  - `Task04_Franka_Tableware_Banana_Plate`
+  - `Task05_Franka_Tableware_Stack_Cup`
+  - `Task06_Franka_Tableware_Stapler_Box`
+  - `Task07_Franka_Tableware_Pour_Water`
+  - `Task08_Franka_Tableware_Drawer`
+  - `Task09_Franka_Tableware_Banana_Drawer`
+  - `Task10_Franka_Tableware_Towel`
+  - `Task11_Bi_Franka_Tableware_Cook` *(Dual Arm)*
+  - `Task12_Bi_Franka_Tableware_Big_Box` *(Dual Arm)*
+
+- `frame_idx`: Frame index to process (e.g., 0, 1, 2). Default is null, which means processing all frame indices
+
+- `MODELNAME`: The world model to be evaluated (e.g., veo, wan_26, cosmos)
+
+### For Dual Arm Task
+```bash
+cd third_party/phantom/phantom
+
+# Mask half of a video with black pixels to isolate a single hand. 
+python utils/black_impaint.py \
+    --input_video "../data/raw/hand_dataset/TASK_NAME/X/X_MODELNAME_rgb.mp4" \
+
+# Process right hand action
+python process_data.py   is_hand_dataset=true   task_name=TASK_NAME  target_hand="right" video_patterns='*_MODELNAME_left_black_rgb.mp4'  'mode=[bbox,hand2d,action,smoothing]'   data_root_dir=../data/raw   processed_data_root_dir=../data/processed
+
+# Process left hand action
+python process_data.py   is_hand_dataset=true   task_name=TASK_NAME  target_hand="left" video_patterns='*_MODELNAME_right_black_rgb.mp4'  'mode=[bbox,hand2d,action,smoothing]'   data_root_dir=../data/raw   processed_data_root_dir=../data/processed
+```
+
 ## Evaluation
+
+### Robot
 
 After IDM produces outputs, run `sh/parquet2action.sh` to convert the predicted actions into trajectory JSON files:
 
@@ -145,6 +199,25 @@ python scripts/robot/eval_franka.py \
   --part_scores \  # Whether to enable per-stage scoring; only Franka-put_on_plate, Franka-discard_trash, Franka-put_in_drawer have stage-score design
   # --episode_index 9  # Test a single JSON index only
   # --save_dataset  \   # Whether to save execution data
+```
+
+### Human
+```bash
+# For Single Arm Tasks (Add --debug to print more information)
+python scripts/human/dataset_replay_npz.py \
+    --task_name "Task04_Franka_Tableware_Banana_Plate" \
+    --model_name "human" \
+    --num_envs 1 \
+    --enable_cameras \
+    --device cpu
+
+# For Dual Arm Tasks (Add --debug to print more information)
+python scripts/human/dataset_replay_npz_bi.py \
+    --task_name "Task11_Bi_Franka_Tableware_Cook" \
+    --model_name "human" \
+    --num_envs 1 \
+    --enable_cameras \
+    --device cpu
 ```
 
 ## Roadmap
